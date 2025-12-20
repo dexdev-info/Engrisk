@@ -1,0 +1,77 @@
+{
+  // =========================
+  // PHP & LARAVEL
+  // =========================
+  "php.version": "8.5",
+
+  "php.namespaceResolver.autoSort": true,
+  "php.namespaceResolver.sortAlphabetically": true,
+
+  "intelephense.format.enable": true,
+  "intelephense.diagnostics.enable": true,
+  "intelephense.telemetry.enabled": false,
+  "intelephense.completion.fullyQualifyGlobalConstantsAndFunctions": true,
+  "intelephense.completion.triggerParameterHints": true,
+
+  "laravel-extra-intellisense.enabled": true,
+
+  // =========================
+  // FORMATTERS
+  // =========================
+  "[php]": {
+    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "Vue.volar"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+
+  // =========================
+  // BLADE & EMMET
+  // =========================
+  "files.associations": {
+    "*.blade.php": "blade"
+  },
+  "emmet.includeLanguages": {
+    "blade": "html"
+  },
+
+  // =========================
+  // EDITOR UI
+  // =========================
+  "editor.minimap.enabled": false,
+  "editor.accessibilitySupport": "off",
+
+  "workbench.colorTheme": "Evondev Dracula High Contrast New Color",
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.editor.empty.hint": "hidden",
+
+  // =========================
+  // GIT & SECURITY
+  // =========================
+  "security.workspace.trust.untrustedFiles": "open",
+
+  // =========================
+  // COPILOT (GIỮ 1 AI CHÍNH)
+  // =========================
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false
+  },
+  "github.copilot.nextEditSuggestions.enabled": true,
+
+  // =========================
+  // LIVE SERVER
+  // =========================
+  "liveServer.settings.donotShowInfoMsg": true,
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}

@@ -5,6 +5,7 @@ import MainLayout from './layouts/MainLayout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
+import CourseDetail from './pages/CourseDetail';
 
 // Component bảo vệ route (Giống middleware auth bên Laravel)
 const PrivateRoute = ({ children }) => {
@@ -35,6 +36,7 @@ function App() {
       >
         {/* Trang Home sẽ nằm trong Outlet của MainLayout */}
         <Route index element={<Home />} /> 
+        <Route path="course/:id" element={<CourseDetail />} />
         
         {/* Sau này thêm trang khóa học vào đây dễ dàng */}
         {/* <Route path="courses" element={<Courses />} /> */}

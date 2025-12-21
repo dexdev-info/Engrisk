@@ -11,6 +11,11 @@ const courseService = {
     getCourseById: async (id) => {
         const response = await api.get(`/courses/${id}`);
         return response.data;
+    },
+
+    getVocabByLesson: async (lessonId) => {
+        const response = await api.get(`/courses/lessons/${lessonId}/vocab`);
+        return response.data;
     }
 };
 

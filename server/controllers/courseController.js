@@ -1,5 +1,6 @@
 const Course = require('../models/Course');
 const Lesson = require('../models/Lesson');
+const Vocabulary = require('../models/Vocabulary');
 
 // @desc    Get all courses
 // @route   GET /api/courses
@@ -35,4 +36,13 @@ const getCourseById = async (req, res) => {
     }
 };
 
-module.exports = { getCourses, getCourseById };
+const getVocabByLesson = async (req, res) => {
+    try {
+        const vocabList = await Vocabulary.find({ lesson: req.params.id });
+        res.json(vocabList);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { getCourses, getCourseById, getVocabByLesson };

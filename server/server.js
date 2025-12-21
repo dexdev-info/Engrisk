@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const cookieParser = require('cookie-parser');
+const courseRoutes = require('./routes/courseRoutes');
 
 // 1. Load config từ file .env
 dotenv.config();
@@ -22,6 +23,7 @@ app.use(express.json()); // Cho phép đọc data JSON từ body (giống $reque
 app.use(express.urlencoded({ extended: true })); // Cho phép đọc data từ form-urlencoded
 app.use(cookieParser()); // Cho phép đọc cookie từ request
 app.use('/api/users', userRoutes);
+app.use('/api/courses', courseRoutes);
 
 // 5. Route test (Để xem server sống hay chết)
 app.get('/', (req, res) => {

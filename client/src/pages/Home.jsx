@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import courseService from '../services/courseService';
 import CourseCard from '../components/CourseCard';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 const Home = () => {
     const { user } = useAuth();

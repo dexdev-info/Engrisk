@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa'; // Nhớ cài react-icons rồi nhé
 
 const Header = () => {

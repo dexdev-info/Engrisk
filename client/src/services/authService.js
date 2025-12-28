@@ -1,6 +1,6 @@
 import api from './api';
 
-const authService = {
+export const authService = {
     // Đăng ký
     register: async (userData) => {
         const response = await api.post('/users/register', userData);
@@ -25,5 +25,3 @@ const authService = {
         return response.data;
     },
 };
-
-export default authService;

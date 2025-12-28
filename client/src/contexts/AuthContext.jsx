@@ -1,19 +1,12 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import authService from '../services/authService';
+import { useState, useEffect } from 'react';
+import { authService } from '../services/authService';
+import { AuthContext } from './auth.config';
 
-// 1. Tạo Context
-const AuthContext = createContext();
-
-// Export một Custom Hook để các component khác dùng cho tiện
-// Thay vì viết: useContext(AuthContext) -> Giờ viết: useAuth()
-export const useAuth = () => {
-    return useContext(AuthContext);
-};
-
-// 2. Tạo Provider
-export const AuthProvider = ({ children }) => {
+// 1. Tạo Provider
+export const AuthProvider = ({ children }) => { // children là toàn bộ App bên trong <AuthProvider>
     const [user, setUser] = useState(null); // Lưu info user
     const [loading, setLoading] = useState(true); // Trạng thái load lần đầu
+    const [error, setError] = useState(null);
 
     // Check login ngay khi F5 trang
     useEffect(() => {
@@ -21,9 +14,10 @@ export const AuthProvider = ({ children }) => {
             try {
                 const data = await authService.getCurrentUser();
                 setUser(data);
-            } catch (error) {
+            } catch (err) {
                 // Lỗi 401 nghĩa là chưa login hoặc token hết hạn -> Kệ nó
                 setUser(null);
+                setError(err.message);
             } finally {
                 setLoading(false);
             }
@@ -56,6 +50,7 @@ export const AuthProvider = ({ children }) => {
     const value = {
         user,
         loading,
+        error,
         login,
         register,
         logout

@@ -8,6 +8,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const errorHandler = require('./middleware/errorHandler');
 const userRoutes = require('./routes/userRoutes');
 const courseRoutes = require('./routes/courseRoutes');
+const rateLimit = require('express-rate-limit');
 
 // Load env vars
 dotenv.config();
@@ -23,15 +24,15 @@ app.use(express.urlencoded({ extended: true })); // Cho phép đọc data từ f
 app.use(cookieParser()); // Cho phép đọc cookie từ request
 
 // Dev logging middleware
-// if (process.env.NODE_ENV === 'development') {
-//     app.use(morgan('dev'));
-// }
+if (process.env.NODE_ENV === 'development') {
+    app.use(morgan('dev'));
+}
 
 // Security Headers
-// app.use(helmet());
+app.use(helmet());
 
 // Prevent NoSQL injection (Quan trọng với MongoDB)
-// app.use(mongoSanitize());
+app.use(mongoSanitize());
 
 // Enable CORS Cho phép Client gọi API
 app.use(cors({
@@ -44,9 +45,11 @@ app.get('/', (req, res) => {
     res.send('Engrisk API is running... 🚀');
 });
 
-// Import Routes here (Example)
+// Import Routes
 // const authRoutes = require('./routes/auth.routes');
 // app.use('/api/auth', authRoutes);
+
+// API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
 

@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Name is required'],
         trim: true,
+        minlength: [2, 'Name must be at least 2 characters'],
         maxlength: [50, 'Name cannot exceed 50 characters']
     },
     email: {
@@ -36,10 +37,12 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    // Enrolled courses (for quick access)
     enrolledCourses: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Course'
     }],
+    // Learning streak tracking
     currentStreak: {
         type: Number,
         default: 0
@@ -51,22 +54,90 @@ const userSchema = new mongoose.Schema({
     lastActivityDate: {
         type: Date,
         default: null
+    },
+    // Total statistics
+    totalLessonsCompleted: {
+        type: Number,
+        default: 0
+    },
+    totalExercisesCompleted: {
+        type: Number,
+        default: 0
+    },
+    totalVocabulariesMastered: {
+        type: Number,
+        default: 0
+    },
+    totalPoints: {
+        type: Number,
+        default: 0
     }
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 
-// Middleware: Hash password before saving
+// Virtual for user achievements
+userSchema.virtual('achievements', {
+    ref: 'UserAchievement',
+    localField: '_id',
+    foreignField: 'user'
+});
+
+// Hash password before saving
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+
+    try {
+        const salt = await bcrypt.genSalt(12);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        next(error);
+    }
 });
 
-// Method: Kiểm tra password nhập vào có khớp với hash trong DB không
-userSchema.methods.matchPassword = async function (enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
+// Compare password method
+userSchema.methods.comparePassword = async function (candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
 };
+
+// Update activity date and streak
+userSchema.methods.updateActivity = async function () {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const lastActivity = this.lastActivityDate ? new Date(this.lastActivityDate) : null;
+
+    if (lastActivity) {
+        lastActivity.setHours(0, 0, 0, 0);
+        const dayDiff = Math.floor((today - lastActivity) / (1000 * 60 * 60 * 24));
+
+        if (dayDiff === 1) {
+            // Consecutive day
+            this.currentStreak += 1;
+            if (this.currentStreak > this.longestStreak) {
+                this.longestStreak = this.currentStreak;
+            }
+        } else if (dayDiff > 1) {
+            // Streak broken
+            this.currentStreak = 1;
+        }
+        // If dayDiff === 0, same day, no change
+    } else {
+        // First activity
+        this.currentStreak = 1;
+        this.longestStreak = 1;
+    }
+
+    this.lastActivityDate = new Date();
+    await this.save();
+};
+
+// Indexes
+userSchema.index({ email: 1 });
+userSchema.index({ role: 1 });
 
 const User = mongoose.model('User', userSchema);
 

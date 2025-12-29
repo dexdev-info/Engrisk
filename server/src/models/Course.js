@@ -57,6 +57,16 @@ const courseSchema = mongoose.Schema({
     estimatedDuration: {
         type: Number,
         default: 0
+    },
+    // ===== Soft Delete =====
+    isDeleted: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
+    deletedAt: {
+        type: Date,
+        default: null
     }
 }, {
     timestamps: true,
@@ -72,22 +82,55 @@ courseSchema.virtual('lessons', {
     options: { sort: { orderIndex: 1 } }
 });
 
-// Auto-generate slug from title
-courseSchema.pre('save', function (next) {
-    if (this.isModified('title')) {
-        this.slug = slugify(this.title, {
-            lower: true,
-            strict: true,
-            remove: /[*+~.()'"!:@]/g
-        });
-    }
-    next();
+/* =======================
+    QUERY FILTER
+======================= */
+function autoExcludeDeleted() {
+    this.where({ isDeleted: false });
+}
+
+courseSchema.pre('find', autoExcludeDeleted);
+courseSchema.pre('findOne', autoExcludeDeleted);
+courseSchema.pre('countDocuments', autoExcludeDeleted);
+
+/* =======================
+    SLUG
+======================= */
+courseSchema.pre('save', function () {
+    if (!this.isModified('title')) return;
+
+    this.slug = slugify(this.title, {
+        lower: true,
+        strict: true,
+        remove: /[*+~.()'"!:@]/g
+    });
 });
 
-// Update lessonsCount when lessons are added/removed
+/* =======================
+    LESSON COUNT
+======================= */
 courseSchema.methods.updateLessonsCount = async function () {
     const Lesson = mongoose.model('Lesson');
-    this.lessonsCount = await Lesson.countDocuments({ course: this._id });
+    this.lessonsCount = await Lesson.countDocuments({
+        course: this._id,
+        isDeleted: false
+    });
+    await this.save();
+};
+
+/* =======================
+    SOFT DELETE (CASCADE)
+======================= */
+courseSchema.methods.softDelete = async function () {
+    const Lesson = mongoose.model('Lesson');
+
+    await Lesson.updateMany(
+        { course: this._id },
+        { isDeleted: true, deletedAt: new Date() }
+    );
+
+    this.isDeleted = true;
+    this.deletedAt = new Date();
     await this.save();
 };
 

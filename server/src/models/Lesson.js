@@ -56,6 +56,16 @@ const lessonSchema = mongoose.Schema({
         type: String,
         enum: ['theory', 'practice', 'mixed'],
         default: 'mixed'
+    },
+    // ===== Soft Delete =====
+    isDeleted: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
+    deletedAt: {
+        type: Date,
+        default: null
     }
 }, {
     timestamps: true,
@@ -71,34 +81,47 @@ lessonSchema.virtual('exercises', {
     options: { sort: { orderIndex: 1 } }
 });
 
-// Auto-generate slug from title + course
-lessonSchema.pre('save', async function (next) {
-    if (this.isModified('title')) {
-        const baseSlug = slugify(this.title, {
-            lower: true,
-            strict: true,
-            remove: /[*+~.()'"!:@]/g
-        });
+/* =======================
+    QUERY FILTER
+======================= */
+function autoExcludeDeleted() {
+    this.where({ isDeleted: false });
+}
 
-        // Ensure unique slug within the course
-        let slug = baseSlug;
-        let counter = 1;
+lessonSchema.pre('find', autoExcludeDeleted);
+lessonSchema.pre('findOne', autoExcludeDeleted);
+lessonSchema.pre('countDocuments', autoExcludeDeleted);
 
-        while (await mongoose.model('Lesson').findOne({
-            course: this.course,
-            slug: slug,
-            _id: { $ne: this._id }
-        })) {
-            slug = `${baseSlug}-${counter}`;
-            counter++;
-        }
+/* =======================
+    SLUG UNIQUE / COURSE
+======================= */
+lessonSchema.pre('save', async function () {
+    if (!this.isModified('title')) return;
 
-        this.slug = slug;
+    const baseSlug = slugify(this.title, {
+        lower: true,
+        strict: true,
+        remove: /[*+~.()'"!:@]/g
+    });
+
+    let slug = baseSlug;
+    let counter = 1;
+
+    while (await mongoose.model('Lesson').findOne({
+        course: this.course,
+        slug,
+        _id: { $ne: this._id }
+    })) {
+        slug = `${baseSlug}-${counter++}`;
     }
-    next();
+
+    this.slug = slug;
 });
 
-// Update course lessonsCount after save/delete
+
+/* =======================
+    UPDATE COURSE COUNTS
+======================= */
 lessonSchema.post('save', async function () {
     const Course = mongoose.model('Course');
     const course = await Course.findById(this.course);
@@ -107,13 +130,18 @@ lessonSchema.post('save', async function () {
     }
 });
 
-lessonSchema.post('remove', async function () {
+/* =======================
+    SOFT DELETE
+======================= */
+lessonSchema.methods.softDelete = async function () {
+    this.isDeleted = true;
+    this.deletedAt = new Date();
+    await this.save();
+
     const Course = mongoose.model('Course');
     const course = await Course.findById(this.course);
-    if (course) {
-        await course.updateLessonsCount();
-    }
-});
+    if (course) await course.updateLessonsCount();
+};
 
 // Compound index for unique slug per course
 lessonSchema.index({ course: 1, slug: 1 }, { unique: true });

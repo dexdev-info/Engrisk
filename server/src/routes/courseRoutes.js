@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getCourses, getCourseById, getVocabByLesson } = require('../controllers/courseController');
-const { protect } = require('../middleware/authMiddleware'); // Import middleware bảo vệ
+const { protect } = require('../middleware/auth.middleware'); // Import middleware bảo vệ
 
 // Ai cũng xem được danh sách khóa học
 router.get('/', getCourses);

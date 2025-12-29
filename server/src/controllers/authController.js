@@ -1,90 +1,99 @@
-// server/controllers/authController.js
-const User = require('../models/User');
-const generateToken = require('../utils/generateToken');
+const authService = require('../services/authService');
+const ErrorResponse = require('../utils/errorResponse');
 
-// @desc    Register a new user
-// @route   POST /api/users/register
-// @access  Public
-const registerUser = async (req, res) => {
-    const { name, email, password } = req.body;
+// Cấu hình Cookie
+const cookieOptions = {
+    httpOnly: true, // JS không đọc được
+    secure: process.env.NODE_ENV === 'production', // Chỉ gửi qua HTTPS ở Production
+    sameSite: 'strict', // Chống CSRF
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 ngày
+};
 
+exports.register = async (req, res, next) => {
     try {
-        const userExists = await User.findOne({ email });
+        const user = await authService.register(req.body);
 
-        if (userExists) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
-
-        const user = await User.create({
-            name,
-            email,
-            password, 
+        // Đăng ký xong chưa login ngay (tùy logic, ở đây mình trả về success để client tự redirect sang login)
+        res.status(201).json({
+            success: true,
+            message: 'Đăng ký thành công! Vui lòng đăng nhập.',
+            data: {
+                id: user._id,
+                name: user.name,
+                email: user.email
+            }
         });
-
-        if (user) {
-            generateToken(res, user._id); // <--- Tạo token và set cookie luôn
-            res.status(201).json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-            });
-        } else {
-            res.status(400).json({ message: 'Invalid user data' });
-        }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 };
 
-// @desc    Auth user & get token
-// @route   POST /api/users/auth (Login)
-// @access  Public
-const loginUser = async (req, res) => {
-    const { email, password } = req.body;
-
+exports.login = async (req, res, next) => {
     try {
-        const user = await User.findOne({ email });
+        const { email, password } = req.body;
+        const ipAddress = req.ip;
 
-        // Dùng hàm matchPassword đã viết trong Model
-        if (user && (await user.matchPassword(password))) {
-            generateToken(res, user._id); // <--- Set cookie
-            res.json({
-                _id: user._id,
+        const { user, accessToken, refreshToken } = await authService.login({ email, password, ipAddress });
+
+        // Set Refresh Token vào Cookie
+        res.cookie('refreshToken', refreshToken, cookieOptions);
+
+        res.status(200).json({
+            success: true,
+            accessToken, // Gửi Access Token qua JSON
+            user: {
+                id: user._id,
                 name: user.name,
                 email: user.email,
-            });
-        } else {
-            res.status(401).json({ message: 'Invalid email or password' });
-        }
+                role: user.role,
+                avatar: user.avatar
+            }
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 };
 
-// @desc    Logout user / clear cookie
-// @route   POST /api/users/logout
-// @access  Public
-const logoutUser = (req, res) => {
-    res.cookie('jwt', '', {
-        httpOnly: true,
-        expires: new Date(0), // Set ngày hết hạn về quá khứ để xóa cookie
-    });
-    res.status(200).json({ message: 'Logged out successfully' });
+exports.refreshToken = async (req, res, next) => {
+    try {
+        const token = req.cookies.refreshToken; // Lấy từ Cookie
+        const ipAddress = req.ip;
+
+        if (!token) {
+            return next(new ErrorResponse('Refresh Token is required', 400));
+        }
+
+        const result = await authService.refreshToken({ token, ipAddress });
+
+        // Update lại Cookie mới (Rotation)
+        res.cookie('refreshToken', result.refreshToken, cookieOptions);
+
+        res.status(200).json({
+            success: true,
+            accessToken: result.accessToken
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
-const getUserProfile = async (req, res) => {
-    // req.user đã có sẵn nhờ middleware 'protect' ở trên
-    const user = {
-        _id: req.user._id,
-        name: req.user.name,
-        email: req.user.email,
-    };
-    res.status(200).json(user);
-};
+exports.logout = async (req, res, next) => {
+    try {
+        const token = req.cookies.refreshToken;
+        const ipAddress = req.ip;
 
-module.exports = {
-    registerUser,
-    loginUser,
-    logoutUser,
-    getUserProfile,
+        if (token) {
+            await authService.logout(token, ipAddress);
+        }
+
+        // Xóa cookie
+        res.cookie('refreshToken', '', { ...cookieOptions, expires: new Date(0) });
+
+        res.status(200).json({
+            success: true,
+            message: 'Đăng xuất thành công'
+        });
+    } catch (error) {
+        next(error);
+    }
 };

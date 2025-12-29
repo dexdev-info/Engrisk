@@ -71,6 +71,16 @@ const userSchema = new mongoose.Schema({
     totalPoints: {
         type: Number,
         default: 0
+    },
+    // ===== Soft Delete =====
+    isDeleted: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
+    deletedAt: {
+        type: Date,
+        default: null
     }
 }, {
     timestamps: true,
@@ -85,22 +95,40 @@ userSchema.virtual('achievements', {
     foreignField: 'user'
 });
 
-// Hash password before saving
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+/* =======================
+    GLOBAL QUERY FILTER
+======================= */
+function autoExcludeDeleted() {
+    this.where({ isDeleted: false });
+}
 
-    try {
-        const salt = await bcrypt.genSalt(12);
-        this.password = await bcrypt.hash(this.password, salt);
-        next();
-    } catch (error) {
-        next(error);
-    }
+userSchema.pre('find', autoExcludeDeleted);
+userSchema.pre('findOne', autoExcludeDeleted);
+userSchema.pre('countDocuments', autoExcludeDeleted);
+
+/* =======================
+    PASSWORD
+======================= */
+// Hash password before saving
+userSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
+
+    const salt = await bcrypt.genSalt(12);
+    this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Compare password method
 userSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
+};
+
+/* =======================
+    SOFT DELETE METHOD
+======================= */
+userSchema.methods.softDelete = async function () {
+    this.isDeleted = true;
+    this.deletedAt = new Date();
+    await this.save();
 };
 
 // Update activity date and streak

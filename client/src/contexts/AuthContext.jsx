@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { authService } from '../services/authService';
 import { AuthContext } from './auth.config';
+import { Spin } from 'antd';
 
 // 1. Tạo Provider
 export const AuthProvider = ({ children }) => { // children là toàn bộ App bên trong <AuthProvider>
@@ -10,10 +11,10 @@ export const AuthProvider = ({ children }) => { // children là toàn bộ App b
 
     // Check login ngay khi F5 trang
     useEffect(() => {
-        const checkLoggedIn = async () => {
+        const checkAuth = async () => {
             try {
-                const data = await authService.getCurrentUser();
-                setUser(data);
+                const userData = await authService.getCurrentUser();
+                setUser(userData);
             } catch (err) {
                 // Lỗi 401 nghĩa là chưa login hoặc token hết hạn -> Kệ nó
                 setUser(null);
@@ -23,13 +24,13 @@ export const AuthProvider = ({ children }) => { // children là toàn bộ App b
             }
         };
 
-        checkLoggedIn();
+        checkAuth();
     }, []);
 
-    // Hàm Login dùng chung cho cả App
+    // Hàm Login
     const login = async (email, password) => {
         const data = await authService.login(email, password);
-        setUser(data);
+        setUser(data); // Backend trả về user info
         return data;
     };
 
@@ -42,8 +43,19 @@ export const AuthProvider = ({ children }) => { // children là toàn bộ App b
 
     // Hàm Logout
     const logout = async () => {
-        await authService.logout();
-        setUser(null);
+        try {
+            await authService.logout();
+        } finally {
+            setUser(null);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="h-screen flex justify-center items-center bg-gray-50">
+                <Spin size="large" tip="Đang tải dữ liệu..." />
+            </div>
+        );
     };
 
     // Giá trị chia sẻ cho toàn bộ App
@@ -58,7 +70,7 @@ export const AuthProvider = ({ children }) => { // children là toàn bộ App b
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };

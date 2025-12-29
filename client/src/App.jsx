@@ -1,47 +1,26 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './hooks/useAuth';
-import MainLayout from './layouts/MainLayout';
-
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Home from './pages/Home';
-import CourseDetail from './pages/CourseDetail';
-
-// Component bảo vệ route (Giống middleware auth bên Laravel)
-const PrivateRoute = ({ children }) => {
-  const { user } = useAuth();
-  // Nếu chưa login -> Đá về trang login
-  return user ? children : <Navigate to="/login" />;
-};
+import { ConfigProvider } from 'antd';
+import { RouterProvider } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import router from './router';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 function App() {
-  const { loading } = useAuth();
-
-  if (loading) return <div className="text-center mt-20">Loading...</div>;
-
   return (
-    <Routes>
-      {/* Route công khai (Login/Register không cần Header) */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-
-      {/* Route cần đăng nhập + Có Header (MainLayout) */}
-      <Route 
-        path="/" 
-        element={
-          <PrivateRoute>
-             <MainLayout /> {/* Layout bọc ngoài */}
-          </PrivateRoute>
-        } 
-      >
-        {/* Trang Home sẽ nằm trong Outlet của MainLayout */}
-        <Route index element={<Home />} /> 
-        <Route path="course/:id" element={<CourseDetail />} />
-        
-        {/* Sau này thêm trang khóa học vào đây dễ dàng */}
-        {/* <Route path="courses" element={<Courses />} /> */}
-      </Route>
-    </Routes>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#1677ff',
+          fontFamily: 'Inter, sans-serif',
+        },
+      }}
+    >
+      {/* Bọc AuthProvider ngoài RouterProvider */}
+      <AuthProvider>
+        <RouterProvider router={router} />
+        <ToastContainer position="top-right" autoClose={3000} />
+      </AuthProvider>
+    </ConfigProvider>
   );
 }
 

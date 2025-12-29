@@ -1,4 +1,4 @@
-import api from './api';
+import api from '../lib/api';
 
 const courseService = {
     // Lấy tất cả khóa học (Hiện ở trang chủ)

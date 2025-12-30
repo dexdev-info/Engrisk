@@ -1,51 +1,61 @@
 import { useState, useEffect } from 'react';
 import { authService } from '../services/authService';
 import { AuthContext } from './auth.config';
+import { setAccessToken, clearAccessToken } from '../lib/api';
 import { Spin } from 'antd';
 
 // 1. Tạo Provider
 export const AuthProvider = ({ children }) => { // children là toàn bộ App bên trong <AuthProvider>
     const [user, setUser] = useState(null); // Lưu info user
     const [loading, setLoading] = useState(true); // Trạng thái load lần đầu
-    const [error, setError] = useState(null);
 
     // Check login ngay khi F5 trang
     useEffect(() => {
+        let isBootstrapped = false;
+        if (isBootstrapped) return;
+        isBootstrapped = true;
+
         const checkAuth = async () => {
             try {
+                // 1. Try refresh token
+                const { accessToken } = await authService.refresh();
+                setAccessToken(accessToken);
+
+                // 2. Get current user profile
                 const userData = await authService.getCurrentUser();
-                setUser(userData);
-            } catch (err) {
-                // Lỗi 401 nghĩa là chưa login hoặc token hết hạn -> Kệ nó
+                setUser(userData.data);
+            } catch {
+                clearAccessToken();
                 setUser(null);
-                setError(err.message);
             } finally {
                 setLoading(false);
             }
         };
-
         checkAuth();
     }, []);
 
-    // Hàm Login
+    // ===== LOGIN =====
     const login = async (email, password) => {
         const data = await authService.login(email, password);
-        setUser(data); // Backend trả về user info
-        return data;
+        // Backend trả: { accessToken, user }
+        setAccessToken(data.accessToken); // <--- Nạp token vào RAM
+        setUser(data.user); // <--- Lưu thông tin user
+        return data; // cho page dùng nếu cần (redirect, toast, role...)
     };
 
-    // Hàm Register
+    // ===== REGISTER =====
     const register = async (userData) => {
+        // userData = { name, email, password }
         const data = await authService.register(userData);
-        setUser(data); // Đăng ký xong tự login luôn
         return data;
     };
 
-    // Hàm Logout
+    // ===== LOGOUT =====
     const logout = async () => {
         try {
             await authService.logout();
         } finally {
+            clearAccessToken();
             setUser(null);
         }
     };
@@ -58,11 +68,10 @@ export const AuthProvider = ({ children }) => { // children là toàn bộ App b
         );
     };
 
-    // Giá trị chia sẻ cho toàn bộ App
+    // ===== Public API =====
     const value = {
         user,
         loading,
-        error,
         login,
         register,
         logout

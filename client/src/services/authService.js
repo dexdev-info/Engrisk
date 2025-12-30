@@ -1,4 +1,5 @@
-import api from '@/lib/api';
+import api from '../lib/api';
+import axios from 'axios';
 
 export const authService = {
     // Đăng ký
@@ -13,10 +14,18 @@ export const authService = {
         return response.data;
     },
 
-    // Đăng xuất
     logout: async () => {
-        const response = await api.post('/auth/logout');
-        return response.data;
+        await api.post('/auth/logout', {});
+    },
+
+    // Hàm refresh token để lấy access token mới 
+    refresh: async () => {
+        const response = await axios.post(
+            '/api/auth/refresh-token',
+            {},
+            { withCredentials: true }
+        );
+        return response.data; // { accessToken }
     },
 
     // Lấy thông tin user hiện tại (Check session)

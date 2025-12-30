@@ -4,8 +4,11 @@ const ErrorResponse = require('../utils/errorResponse');
 // Cấu hình Cookie
 const cookieOptions = {
     httpOnly: true, // JS không đọc được
-    secure: process.env.NODE_ENV === 'production', // Chỉ gửi qua HTTPS ở Production
-    sameSite: 'strict', // Chống CSRF
+    // secure: process.env.NODE_ENV === 'production', // Chỉ gửi cookie qua HTTPS
+    secure: false, // localhost = http
+    sameSite: 'lax', // Chuẩn SPA cross-site request, nếu để 'strict'
+                    // hoặc 'none' sẽ không hoạt động nếu khác domain
+                    // lên production dùng 'none'.
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 ngày
 };
 

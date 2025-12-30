@@ -19,7 +19,7 @@ const Register = () => {
                 password: values.password
             });
             toast.success('Đăng ký thành công! Hãy bắt đầu học ngay. 🚀');
-            navigate('/dashboard');
+            navigate('/login');
         } catch (error) {
             toast.error(error.response?.data?.error || 'Đăng ký thất bại');
         } finally {

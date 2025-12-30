@@ -6,7 +6,11 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const errorHandler = require('./middleware/errorHandler');
+
+// Routes Imports
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+
 const courseRoutes = require('./routes/courseRoutes');
 const rateLimit = require('express-rate-limit');
 
@@ -17,8 +21,6 @@ dotenv.config();
 const app = express();
 
 // --- Middlewares ---
-
-// Body parser
 app.use(express.json()); // Cho phép đọc data JSON từ body (giống $request->json() trong Laravel)
 app.use(express.urlencoded({ extended: true })); // Cho phép đọc data từ form-urlencoded
 app.use(cookieParser()); // Cho phép đọc cookie từ request
@@ -51,8 +53,8 @@ app.get('/', (req, res) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 // app.use('/api/courses', courseRoutes);
-
 
 // --- Error Handler (Must be last) ---
 app.use(errorHandler);

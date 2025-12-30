@@ -3,6 +3,7 @@ import { Layout, theme } from 'antd';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../common/Sidebar';
 import AppHeader from '../common/Header';
+import { useAuth } from '../../hooks/useAuth';
 
 const { Content } = Layout;
 
@@ -11,6 +12,9 @@ const MainLayout = () => {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+
+    const { loading } = useAuth();
+    if (loading) return null; // hoặc spinner
 
     return (
         <Layout className="min-h-screen">

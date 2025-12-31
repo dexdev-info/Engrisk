@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-const slugify = require('slugify');
+import { Schema, model } from 'mongoose';
+import slugify from 'slugify';
 
-const courseSchema = mongoose.Schema({
+const courseSchema = Schema({
     title: {
         type: String,
         required: [true, 'Course title is required'],
@@ -40,7 +40,7 @@ const courseSchema = mongoose.Schema({
     },
     // Quan hệ: Một khóa học do ai tạo? (Optional: nếu muốn mở rộng cho giảng viên)
     createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
@@ -110,7 +110,7 @@ courseSchema.pre('save', function () {
     LESSON COUNT
 ======================= */
 courseSchema.methods.updateLessonsCount = async function () {
-    const Lesson = mongoose.model('Lesson');
+    const Lesson = model('Lesson');
     this.lessonsCount = await Lesson.countDocuments({
         course: this._id,
         isDeleted: false
@@ -122,7 +122,7 @@ courseSchema.methods.updateLessonsCount = async function () {
     SOFT DELETE (CASCADE)
 ======================= */
 courseSchema.methods.softDelete = async function () {
-    const Lesson = mongoose.model('Lesson');
+    const Lesson = model('Lesson');
 
     await Lesson.updateMany(
         { course: this._id },
@@ -139,5 +139,5 @@ courseSchema.index({ slug: 1 });
 courseSchema.index({ level: 1, isPublished: 1 });
 courseSchema.index({ createdBy: 1 });
 
-const Course = mongoose.model('Course', courseSchema);
-module.exports = Course;
+const Course = model('Course', courseSchema);
+export default Course;

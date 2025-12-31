@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { authService } from '../services/authService';
-import { AuthContext } from './auth.config';
-import { setAccessToken, clearAccessToken } from '../lib/api';
+import { authService } from '../services/authService.js';
+import { AuthContext } from './auth.config.jsx';
+import { setAccessToken, clearAccessToken } from '../lib/api.js';
 import { Spin } from 'antd';
 
 // 1. Tạo Provider

@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { submitExercise } = require('../controllers/exerciseController');
-const { protect } = require('../middleware/auth.middleware');
+import { submitExercise } from '../controllers/exerciseController.js';
+import { protect } from '../middleware/auth.middleware.js';
 
 router.post('/:id/submit', protect, submitExercise);
 
-module.exports = router;
+export default router;

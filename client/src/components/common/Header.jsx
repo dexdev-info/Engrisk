@@ -8,7 +8,7 @@ import {
     ExclamationCircleFilled
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.js';
 import { toast } from 'react-toastify';
 
 const { Header } = Layout;

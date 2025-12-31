@@ -1,18 +1,18 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const exerciseAttemptSchema = new mongoose.Schema({
+const exerciseAttemptSchema = new Schema({
     user: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     exercise: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Exercise',
         required: true
     },
     lesson: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Lesson',
         required: true
     },
@@ -46,7 +46,7 @@ const exerciseAttemptSchema = new mongoose.Schema({
 
 // Update exercise statistics after save
 exerciseAttemptSchema.post('save', async function () {
-    const Exercise = mongoose.model('Exercise');
+    const Exercise = model('Exercise');
     const exercise = await Exercise.findById(this.exercise);
 
     if (exercise) {
@@ -59,7 +59,7 @@ exerciseAttemptSchema.post('save', async function () {
 
     // Update user statistics
     if (this.isCorrect) {
-        const User = mongoose.model('User');
+        const User = model('User');
         await User.findByIdAndUpdate(this.user, {
             $inc: {
                 totalExercisesCompleted: 1,
@@ -74,5 +74,5 @@ exerciseAttemptSchema.index({ user: 1, exercise: 1 });
 exerciseAttemptSchema.index({ user: 1, lesson: 1 });
 exerciseAttemptSchema.index({ attemptedAt: -1 });
 
-const ExerciseAttempt = mongoose.model('ExerciseAttempt', exerciseAttemptSchema);
-module.exports = ExerciseAttempt;
+const ExerciseAttempt = model('ExerciseAttempt', exerciseAttemptSchema);
+export default ExerciseAttempt;

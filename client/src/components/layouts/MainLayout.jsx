@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Layout, theme } from 'antd';
 import { Outlet } from 'react-router-dom';
-import Sidebar from '../common/Sidebar';
-import AppHeader from '../common/Header';
-import { useAuth } from '../../hooks/useAuth';
+import Sidebar from '../common/Sidebar.jsx';
+import AppHeader from '../common/Header.jsx';
+import { useAuth } from '../../hooks/useAuth.js';
 
 const { Content } = Layout;
 

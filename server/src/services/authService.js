@@ -1,12 +1,12 @@
-const User = require('../models/User');
-const RefreshToken = require('../models/RefreshToken');
-const ErrorResponse = require('../utils/errorResponse');
-const { generateAccessToken, generateRefreshTokenString } = require('../utils/token.utils');
+import User from '../models/User.js';
+import RefreshToken from '../models/RefreshToken.js';
+import ErrorResponse from '../utils/errorResponse.js';
+import { generateAccessToken, generateRefreshTokenString } from '../utils/token.utils.js';
 
 /**
  * Register Service
  */
-const register = async (userData) => {
+export const registerUser = async (userData) => {
     const { name, email, password } = userData;
 
     // Check duplicate
@@ -28,7 +28,7 @@ const register = async (userData) => {
 /**
  * Login Service
  */
-const login = async ({ email, password, ipAddress }) => {
+export const loginUser = async ({ email, password, ipAddress }) => {
     const user = await User.findOne({ email }).select('+password');
 
     if (!user || !(await user.comparePassword(password))) {
@@ -58,7 +58,7 @@ const login = async ({ email, password, ipAddress }) => {
 /**
  * Refresh Token Service (Rotation Flow)
  */
-const refreshToken = async ({ token, ipAddress }) => {
+export const refreshAccessToken = async ({ token, ipAddress }) => {
     const refreshTokenDoc = await RefreshToken.findOne({ token });
 
     if (!refreshTokenDoc) {
@@ -101,7 +101,7 @@ const refreshToken = async ({ token, ipAddress }) => {
 /**
  * Logout Service
  */
-const logout = async (token, ipAddress) => {
+export const logoutUser = async (token, ipAddress) => {
     const refreshTokenDoc = await RefreshToken.findOne({ token });
 
     if (!refreshTokenDoc) return; // Token không tồn tại thì thôi coi như xong
@@ -110,11 +110,4 @@ const logout = async (token, ipAddress) => {
     refreshTokenDoc.revoked = new Date();
     refreshTokenDoc.revokedByIp = ipAddress;
     await refreshTokenDoc.save();
-};
-
-module.exports = {
-    register,
-    login,
-    refreshToken,
-    logout
 };

@@ -1,11 +1,12 @@
-const jwt = require('jsonwebtoken');
-const ErrorResponse = require('../utils/errorResponse');
-const User = require('../models/User');
+import jwt from 'jsonwebtoken';
+import ErrorResponse from '../utils/errorResponse.js';
+import User from '../models/User.js';
 
-exports.protect = async (req, res, next) => {
+// Middleware bảo vệ route (Login required)
+export const protect = async (req, res, next) => {
     let token;
 
-    // 1. Lấy token từ Header: Authorization: Bearer <token>
+    // 1. Lấy token từ Header
     if (
         req.headers.authorization &&
         req.headers.authorization.startsWith('Bearer')
@@ -18,29 +19,34 @@ exports.protect = async (req, res, next) => {
     }
 
     try {
-        // 2. Verify Token
+        // 2. Verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // 3. Check if user still exists
+        // 3. Check user tồn tại
         const user = await User.findById(decoded.id);
         if (!user) {
             return next(new ErrorResponse('User không còn tồn tại', 401));
         }
 
-        // 4. Gắn user vào request để dùng ở Controller sau
+        // 4. Attach user vào request
         req.user = user;
         next();
     } catch (error) {
-        return next(new ErrorResponse('Token không hợp lệ hoặc đã hết hạn', 401));
+        return next(
+            new ErrorResponse('Token không hợp lệ hoặc đã hết hạn', 401)
+        );
     }
 };
 
-// Middleware phân quyền (Admin only)
-exports.authorize = (...roles) => {
+// Middleware phân quyền
+export const authorize = (...roles) => {
     return (req, res, next) => {
         if (!roles.includes(req.user.role)) {
             return next(
-                new ErrorResponse(`User role ${req.user.role} is not authorized to access this route`, 403)
+                new ErrorResponse(
+                    `User role ${req.user.role} is not authorized`,
+                    403
+                )
             );
         }
         next();

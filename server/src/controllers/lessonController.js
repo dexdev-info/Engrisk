@@ -1,11 +1,11 @@
-const Lesson = require('../models/Lesson');
-const Course = require('../models/Course');
-const UserProgress = require('../models/UserProgress');
-const ErrorResponse = require('../utils/errorResponse');
+import Lesson from '../models/Lesson.js';
+import Course from '../models/Course.js';
+import UserProgress from '../models/UserProgress.js';
+import ErrorResponse from '../utils/errorResponse.js';
 
 // @desc    Get lesson detail by Slug (Public/Private hybrid)
 // @route   GET /api/lessons/:slug
-exports.getLesson = async (req, res, next) => {
+export const getLesson = async (req, res, next) => {
     try {
         const { slug } = req.params;
 
@@ -43,7 +43,7 @@ exports.getLesson = async (req, res, next) => {
 
 // @desc    Mark lesson as completed
 // @route   POST /api/lessons/:id/complete
-exports.completeLesson = async (req, res, next) => {
+export const completeLesson = async (req, res, next) => {
     try {
         const lessonId = req.params.id;
         const lesson = await Lesson.findById(lessonId);

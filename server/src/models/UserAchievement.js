@@ -1,16 +1,16 @@
 // ============================================
 // models/UserAchievement.js
 // ============================================
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const userAchievementSchema = new mongoose.Schema({
+const userAchievementSchema = new Schema({
     user: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     achievement: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Achievement',
         required: true
     },
@@ -29,7 +29,7 @@ const userAchievementSchema = new mongoose.Schema({
 
 // Update achievement unlockedCount after save
 userAchievementSchema.post('save', async function () {
-    const Achievement = mongoose.model('Achievement');
+    const Achievement = model('Achievement');
     await Achievement.findByIdAndUpdate(this.achievement, {
         $inc: { unlockedCount: 1 }
     });
@@ -37,7 +37,7 @@ userAchievementSchema.post('save', async function () {
     // Update user total points
     const achievement = await Achievement.findById(this.achievement);
     if (achievement) {
-        const User = mongoose.model('User');
+        const User = model('User');
         await User.findByIdAndUpdate(this.user, {
             $inc: { totalPoints: achievement.pointsReward }
         });
@@ -48,5 +48,5 @@ userAchievementSchema.post('save', async function () {
 userAchievementSchema.index({ user: 1, achievement: 1 }, { unique: true });
 userAchievementSchema.index({ user: 1, unlockedAt: -1 });
 
-const UserAchievement = mongoose.model('UserAchievement', userAchievementSchema);
-module.exports = UserAchievement;
+const UserAchievement = model('UserAchievement', userAchievementSchema);
+export default UserAchievement;

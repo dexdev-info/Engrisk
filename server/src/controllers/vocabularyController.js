@@ -1,13 +1,13 @@
-const Vocabulary = require('../models/Vocabulary');
-const UserVocabulary = require('../models/UserVocabulary');
-const ErrorResponse = require('../utils/errorResponse');
+import Vocabulary from '../models/Vocabulary.js';
+import UserVocabulary from '../models/UserVocabulary.js';
+import ErrorResponse from '../utils/errorResponse.js';
 
 // ================= PUBLIC =================
 
 // @desc    Get all vocabularies (Dictionary mode)
 // @route   GET /api/vocabularies
 // @query   ?level=beginner&type=noun&search=hello
-exports.getVocabularies = async (req, res, next) => {
+export const getVocabularies = async (req, res, next) => {
     try {
         const { level, partOfSpeech, search, page = 1, limit = 20 } = req.query;
         const query = {};
@@ -42,7 +42,7 @@ exports.getVocabularies = async (req, res, next) => {
 
 // @desc    Toggle Save/Unsave Vocabulary to "My Vocab"
 // @route   POST /api/vocabularies/:id/save
-exports.toggleSaveVocab = async (req, res, next) => {
+export const toggleSaveVocab = async (req, res, next) => {
     try {
         const vocabId = req.params.id;
         
@@ -93,7 +93,7 @@ exports.toggleSaveVocab = async (req, res, next) => {
 // @desc    Get My Vocabularies (Filter & SRS)
 // @route   GET /api/vocabularies/my-vocab
 // @query   ?status=learning|mastered&due=true (due=true để lấy từ cần ôn tập)
-exports.getMyVocabularies = async (req, res, next) => {
+export const getMyVocabularies = async (req, res, next) => {
     try {
         const { status, due } = req.query;
         const query = { user: req.user._id };
@@ -122,7 +122,7 @@ exports.getMyVocabularies = async (req, res, next) => {
 // @desc    Review Vocabulary (SRS Logic)
 // @route   POST /api/vocabularies/review/:id
 // @body    { isCorrect: true/false }
-exports.reviewVocab = async (req, res, next) => {
+export const reviewVocab = async (req, res, next) => {
     try {
         const { isCorrect } = req.body;
         const userVocabId = req.params.id; // ID của UserVocabulary, ko phải Vocab gốc

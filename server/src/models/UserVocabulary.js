@@ -1,14 +1,14 @@
 // models/UserVocabulary.js
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const userVocabularySchema = new mongoose.Schema({
+const userVocabularySchema = new Schema({
     user: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     vocabulary: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Vocabulary',
         required: true
     },
@@ -110,5 +110,5 @@ userVocabularySchema.index({ user: 1, status: 1 });
 userVocabularySchema.index({ user: 1, nextReviewAt: 1 });
 userVocabularySchema.index({ isMastered: 1 });
 
-const UserVocabulary = mongoose.model('UserVocabulary', userVocabularySchema);
-module.exports = UserVocabulary;
+const UserVocabulary = model('UserVocabulary', userVocabularySchema);
+export default UserVocabulary;

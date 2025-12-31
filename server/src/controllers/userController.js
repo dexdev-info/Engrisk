@@ -1,12 +1,12 @@
-const User = require('../models/User');
-const ErrorResponse = require('../utils/errorResponse');
+import User from '../models/User.js';
+import ErrorResponse from '../utils/errorResponse.js';
 
 /**
  * @desc    Get current logged in user
  * @route   GET /api/users/profile
  * @access  Private
  */
-exports.getUserProfile = async (req, res, next) => {
+export const getUserProfile = async (req, res, next) => {
     try {
         // req.user đã được middleware 'protect' gán vào rồi
         // Nhưng để chắc chắn lấy data mới nhất, ta query lại DB (bỏ qua field password)
@@ -39,7 +39,7 @@ exports.getUserProfile = async (req, res, next) => {
  * @route   PUT /api/users/profile
  * @access  Private
  */
-exports.updateUserProfile = async (req, res, next) => {
+export const updateUserProfile = async (req, res, next) => {
     try {
         const fieldsToUpdate = {
             name: req.body.name,

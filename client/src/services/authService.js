@@ -1,4 +1,4 @@
-import api from '../lib/api';
+import api from '../lib/api.js';
 import axios from 'axios';
 
 export const authService = {

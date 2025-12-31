@@ -1,13 +1,13 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const courseEnrollmentSchema = new mongoose.Schema({
+const courseEnrollmentSchema = new Schema({
     user: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     course: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Course',
         required: true
     },
@@ -32,7 +32,7 @@ const courseEnrollmentSchema = new mongoose.Schema({
     },
     // Last lesson accessed
     lastLessonAccessed: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Lesson',
         default: null
     },
@@ -46,8 +46,8 @@ const courseEnrollmentSchema = new mongoose.Schema({
 
 // Calculate progress percentage
 courseEnrollmentSchema.methods.calculateProgress = async function () {
-    const Lesson = mongoose.model('Lesson');
-    const UserProgress = mongoose.model('UserProgress');
+    const Lesson = model('Lesson');
+    const UserProgress = model('UserProgress');
     const totalLessons = await Lesson.countDocuments({
         course: this.course,
         isPublished: true
@@ -72,12 +72,12 @@ courseEnrollmentSchema.methods.calculateProgress = async function () {
 // Update course enrolledCount after save
 courseEnrollmentSchema.post('save', async function () {
     if (this.isNew) {
-        const Course = mongoose.model('Course');
+        const Course = model('Course');
         await Course.findByIdAndUpdate(this.course, {
             $inc: { enrolledCount: 1 }
         });
         // Add to user's enrolledCourses
-        const User = mongoose.model('User');
+        const User = model('User');
         await User.findByIdAndUpdate(this.user, {
             $addToSet: { enrolledCourses: this.course }
         });
@@ -89,5 +89,5 @@ courseEnrollmentSchema.index({ user: 1, course: 1 }, { unique: true });
 courseEnrollmentSchema.index({ user: 1, lastAccessedAt: -1 });
 courseEnrollmentSchema.index({ isCompleted: 1 });
 
-const CourseEnrollment = mongoose.model('CourseEnrollment', courseEnrollmentSchema);
-module.exports = CourseEnrollment;
+const CourseEnrollment = model('CourseEnrollment', courseEnrollmentSchema);
+export default CourseEnrollment;

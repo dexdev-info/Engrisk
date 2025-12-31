@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Form, Input, Button, Divider } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined, GoogleOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.js';
 import { toast } from 'react-toastify';
 
 const Register = () => {

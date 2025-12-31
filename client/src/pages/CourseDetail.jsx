@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Button, Spin, List, Avatar, Tag, Card, Divider, message } from 'antd';
 import { PlayCircleOutlined, ClockCircleOutlined, CheckCircleOutlined, LockOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import courseService from '../services/courseService';
-import { useAuth } from '../hooks/useAuth';
-// import { authService } from '../services/authService';
+import courseService from '../services/courseService.js';
+import { useAuth } from '../hooks/useAuth.js';
+// import { authService } from '../services/authService.js';
 // import { useRevalidator } from 'react-router-dom'; // Nếu dùng data router loader (optional)
 
 const { Title, Paragraph, Text } = Typography;

@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { Spin } from 'antd';
 import { Suspense, lazy } from 'react';
-// import { RequireAuth } from './requireAuth';
+// import { RequireAuth } from './requireAuth.js';
 
 // Layouts
 import MainLayout from '../components/layouts/MainLayout';

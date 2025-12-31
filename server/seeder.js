@@ -1,20 +1,20 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const colors = require('colors'); // Cần cài thêm: npm install colors
-const connectDB = require('./src/config/database');
+import mongoose from 'mongoose';
+import { config } from 'dotenv';
+import colors from 'colors'; // Cần cài thêm: npm install colors
+import connectDB from './src/config/database';
 
 // Load models
-const User = require('./src/models/User');
-const Course = require('./src/models/Course');
-const Lesson = require('./src/models/Lesson');
-const Vocabulary = require('./src/models/Vocabulary');
-const Exercise = require('./src/models/Exercise');
-const UserProgress = require('./src/models/UserProgress');
-const UserVocabulary = require('./src/models/UserVocabulary');
-const ExerciseAttempt = require('./src/models/ExerciseAttempt');
+import { deleteMany, create } from './src/models/User';
+import { deleteMany as _deleteMany, create as _create } from './src/models/Course';
+import { deleteMany as __deleteMany, create as __create } from './src/models/Lesson';
+import { deleteMany as ___deleteMany, create as ___create } from './src/models/Vocabulary';
+import { deleteMany as ____deleteMany, create as ____create } from './src/models/Exercise';
+import { deleteMany as _____deleteMany } from './src/models/UserProgress';
+import { deleteMany as ______deleteMany } from './src/models/UserVocabulary';
+import { deleteMany as _______deleteMany } from './src/models/ExerciseAttempt';
 
 // Load env vars
-dotenv.config();
+config();
 
 // Connect to DB
 connectDB();
@@ -41,25 +41,25 @@ const users = [
 const importData = async () => {
     try {
         // 1. Clear old data
-        await User.deleteMany();
-        await Course.deleteMany();
-        await Lesson.deleteMany();
-        await Vocabulary.deleteMany();
-        await Exercise.deleteMany();
-        await UserProgress.deleteMany();
-        await UserVocabulary.deleteMany();
-        await ExerciseAttempt.deleteMany();
+        await deleteMany();
+        await _deleteMany();
+        await __deleteMany();
+        await ___deleteMany();
+        await ____deleteMany();
+        await _____deleteMany();
+        await ______deleteMany();
+        await _______deleteMany();
 
         console.log('Data Destroyed...'.red.inverse);
 
         // 2. Create Users
-        const createdUsers = await User.create(users);
+        const createdUsers = await create(users);
         const adminUser = createdUsers[0]._id;
 
         console.log('Users Imported...'.green.inverse);
 
         // 3. Create Course
-        const course = await Course.create({
+        const course = await _create({
             title: 'English for Beginners',
             description: 'Khóa học nền tảng dành cho người mất gốc. Tập trung vào từ vựng và ngữ pháp cơ bản.',
             level: 'Beginner',
@@ -72,7 +72,7 @@ const importData = async () => {
         console.log('Course Imported...'.green.inverse);
 
         // 4. Create Lessons
-        const lessons = await Lesson.create([
+        const lessons = await __create([
             {
                 course: course._id,
                 title: 'Bài 1: Chào hỏi (Greetings)',
@@ -112,7 +112,7 @@ Trong bài học này, chúng ta sẽ học cách chào hỏi cơ bản trong ti
         console.log('Lessons Imported...'.green.inverse);
 
         // 5. Create Vocabularies for Lesson 1
-        const vocabs = await Vocabulary.create([
+        const vocabs = await ___create([
             {
                 word: 'Hello',
                 meaning: 'Xin chào',
@@ -150,7 +150,7 @@ Trong bài học này, chúng ta sẽ học cách chào hỏi cơ bản trong ti
         console.log('Vocabularies Imported...'.green.inverse);
 
         // 6. Create Exercises for Lesson 1
-        await Exercise.create([
+        await ____create([
             {
                 lesson: lesson1._id,
                 title: 'Quiz 1: Chọn từ đúng',
@@ -184,14 +184,14 @@ Trong bài học này, chúng ta sẽ học cách chào hỏi cơ bản trong ti
 
 const destroyData = async () => {
     try {
-        await User.deleteMany();
-        await Course.deleteMany();
-        await Lesson.deleteMany();
-        await Vocabulary.deleteMany();
-        await Exercise.deleteMany();
-        await UserProgress.deleteMany();
-        await UserVocabulary.deleteMany();
-        await ExerciseAttempt.deleteMany();
+        await deleteMany();
+        await _deleteMany();
+        await __deleteMany();
+        await ___deleteMany();
+        await ____deleteMany();
+        await _____deleteMany();
+        await ______deleteMany();
+        await _______deleteMany();
 
         console.log('Data Destroyed!'.red.inverse);
         process.exit();

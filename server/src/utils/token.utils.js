@@ -1,28 +1,23 @@
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 /**
  * Generate Access Token (JWT) - Short lived (15m)
  */
-const generateAccessToken = (user) => {
+export const generateAccessToken = (user) => {
     return jwt.sign(
         {
             id: user._id,
             role: user.role
         },
         process.env.JWT_SECRET,
-        { expiresIn: '15m' } // 15 phút
+        { expiresIn: '15m' }
     );
 };
 
 /**
  * Generate Random Refresh Token String
  */
-const generateRefreshTokenString = () => {
+export const generateRefreshTokenString = () => {
     return crypto.randomBytes(40).toString('hex');
-};
-
-module.exports = {
-    generateAccessToken,
-    generateRefreshTokenString
 };

@@ -1,9 +1,9 @@
 
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const notificationSchema = new mongoose.Schema({
+const notificationSchema = new Schema({
     user: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
@@ -35,7 +35,7 @@ const notificationSchema = new mongoose.Schema({
     },
     // Additional data (JSON)
     data: {
-        type: mongoose.Schema.Types.Mixed,
+        type: Schema.Types.Mixed,
         default: {}
     },
     isRead: {
@@ -69,5 +69,5 @@ notificationSchema.index({ user: 1, isRead: 1 });
 notificationSchema.index({ user: 1, createdAt: -1 });
 notificationSchema.index({ type: 1 });
 
-const Notification = mongoose.model('Notification', notificationSchema);
-module.exports = Notification;
+const Notification = model('Notification', notificationSchema);
+export default Notification;

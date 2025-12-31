@@ -1,10 +1,10 @@
-const Exercise = require('../models/Exercise');
-const ExerciseAttempt = require('../models/ExerciseAttempt');
-const ErrorResponse = require('../utils/errorResponse');
+import Exercise from '../models/Exercise.js';
+import ExerciseAttempt from '../models/ExerciseAttempt.js';
+import ErrorResponse from '../utils/errorResponse.js';
 
 // @desc    Submit Exercise Answer
 // @route   POST /api/exercises/:id/submit
-exports.submitExercise = async (req, res, next) => {
+export const submitExercise = async (req, res, next) => {
     try {
         const exerciseId = req.params.id;
         const { userAnswer, timeTaken } = req.body;

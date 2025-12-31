@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Form, Input, Button, Checkbox, Divider, message } from 'antd';
 import { UserOutlined, LockOutlined, GoogleOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.js';
 import { toast } from 'react-toastify';
 
 const Login = () => {

@@ -1,18 +1,18 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const userProgressSchema = new mongoose.Schema({
+const userProgressSchema = new Schema({
     user: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     course: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Course',
         required: true
     },
     lesson: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Lesson',
         required: true
     },
@@ -63,7 +63,7 @@ userProgressSchema.methods.markCompleted = async function () {
         this.completedAt = new Date();
 
         // Update user statistics
-        const User = mongoose.model('User');
+        const User = model('User');
         await User.findByIdAndUpdate(this.user, {
             $inc: { totalLessonsCompleted: 1 }
         });
@@ -77,5 +77,5 @@ userProgressSchema.index({ user: 1, lesson: 1 }, { unique: true });
 userProgressSchema.index({ user: 1, course: 1 });
 userProgressSchema.index({ isCompleted: 1 });
 
-const UserProgress = mongoose.model('UserProgress', userProgressSchema);
-module.exports = UserProgress;
+const UserProgress = model('UserProgress', userProgressSchema);
+export default UserProgress;

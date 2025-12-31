@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
-const slugify = require('slugify');
+import { Schema, model } from 'mongoose';
+import slugify from 'slugify';
 
-const lessonSchema = mongoose.Schema({
+const lessonSchema = Schema({
     course: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         required: [true, 'Course reference is required'],
         ref: 'Course' // <--- Khóa ngoại trỏ về bảng Course
     },
@@ -48,7 +48,7 @@ const lessonSchema = mongoose.Schema({
     },
     // Vocabularies associated with this lesson
     vocabularies: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Vocabulary'
     }],
     // Lesson type for flexibility
@@ -107,7 +107,7 @@ lessonSchema.pre('save', async function () {
     let slug = baseSlug;
     let counter = 1;
 
-    while (await mongoose.model('Lesson').findOne({
+    while (await model('Lesson').findOne({
         course: this.course,
         slug,
         _id: { $ne: this._id }
@@ -123,7 +123,7 @@ lessonSchema.pre('save', async function () {
     UPDATE COURSE COUNTS
 ======================= */
 lessonSchema.post('save', async function () {
-    const Course = mongoose.model('Course');
+    const Course = model('Course');
     const course = await Course.findById(this.course);
     if (course) {
         await course.updateLessonsCount();
@@ -138,7 +138,7 @@ lessonSchema.methods.softDelete = async function () {
     this.deletedAt = new Date();
     await this.save();
 
-    const Course = mongoose.model('Course');
+    const Course = model('Course');
     const course = await Course.findById(this.course);
     if (course) await course.updateLessonsCount();
 };
@@ -148,5 +148,5 @@ lessonSchema.index({ course: 1, slug: 1 }, { unique: true });
 lessonSchema.index({ course: 1, orderIndex: 1 });
 lessonSchema.index({ isPublished: 1 });
 
-const Lesson = mongoose.model('Lesson', lessonSchema);
-module.exports = Lesson;
+const Lesson = model('Lesson', lessonSchema);
+export default Lesson;

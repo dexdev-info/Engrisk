@@ -1,22 +1,20 @@
-const ErrorResponse = require('../utils/errorResponse');
+import ErrorResponse from '../utils/errorResponse.js';
 
 const errorHandler = (err, req, res, next) => {
     let error = { ...err };
     error.message = err.message;
 
-    // Log to console for dev
-    console.log(err);
+    // Log to console (dev)
+    console.error(err);
 
     // Mongoose bad ObjectId
     if (err.name === 'CastError') {
-        const message = `Resource not found`;
-        error = new ErrorResponse(message, 404);
+        error = new ErrorResponse('Resource not found', 404);
     }
 
     // Mongoose duplicate key
     if (err.code === 11000) {
-        const message = 'Duplicate field value entered';
-        error = new ErrorResponse(message, 400);
+        error = new ErrorResponse('Duplicate field value entered', 400);
     }
 
     // Mongoose validation error
@@ -28,8 +26,8 @@ const errorHandler = (err, req, res, next) => {
     res.status(error.statusCode || 500).json({
         success: false,
         error: error.message || 'Server Error',
-        stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+        stack: process.env.NODE_ENV === 'production' ? null : err.stack
     });
 };
 
-module.exports = errorHandler;
+export default errorHandler;

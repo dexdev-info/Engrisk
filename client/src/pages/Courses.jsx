@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Typography, Row, Col, Spin, Empty, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import courseService from '../services/courseService';
-import CourseCard from '../components/course/CourseCard';
+import courseService from '../services/courseService.js';
+import CourseCard from '../components/course/CourseCard.jsx';
 
 const { Title, Paragraph } = Typography;
 

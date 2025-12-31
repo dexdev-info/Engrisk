@@ -1,18 +1,18 @@
-const Course = require('../models/Course');
-const CourseEnrollment = require('../models/CourseEnrollment'); // Để check xem user đã đăng ký chưa
-const ErrorResponse = require('../utils/errorResponse');
+import Course from '../models/Course.js';
+import CourseEnrollment from '../models/CourseEnrollment.js'; // Để check xem user đã đăng ký chưa
+import ErrorResponse from '../utils/errorResponse.js';
 
 // @desc    Get all public courses
 // @route   GET /api/courses
 // @access  Public
-exports.getCourses = async (req, res, next) => {
+export const getCourses = async (req, res, next) => {
     try {
-        const courses = await Course.find({
-            isPublished: true,
-            isDeleted: false
+        const courses = await Course.find({ 
+            isPublished: true, 
+            isDeleted: false 
         })
-            .select('title slug thumbnail level description lessonsCount enrolledCount') // Chỉ lấy field cần thiết
-            .sort({ orderIndex: 1 });
+        .select('title slug thumbnail level description lessonsCount enrolledCount') // Chỉ lấy field cần thiết
+        .sort({ orderIndex: 1 });
 
         res.status(200).json({
             success: true,
@@ -27,12 +27,12 @@ exports.getCourses = async (req, res, next) => {
 // @desc    Get single course by slug
 // @route   GET /api/courses/:slug
 // @access  Public (nhưng nếu login rồi thì trả thêm info enrollment)
-exports.getCourseBySlug = async (req, res, next) => {
+export const getCourseBySlug = async (req, res, next) => {
     try {
-        const course = await Course.findOne({
-            slug: req.params.slug,
-            isPublished: true,
-            isDeleted: false
+        const course = await Course.findOne({ 
+            slug: req.params.slug, 
+            isPublished: true, 
+            isDeleted: false 
         }).populate({
             path: 'lessons',
             select: 'title slug type duration isPublished orderIndex',
@@ -69,7 +69,7 @@ exports.getCourseBySlug = async (req, res, next) => {
 // @desc    Enroll in a course
 // @route   POST /api/courses/:id/enroll
 // @access  Private
-exports.enrollCourse = async (req, res, next) => {
+export const enrollCourse = async (req, res, next) => {
     try {
         const courseId = req.params.id;
         const userId = req.user._id;

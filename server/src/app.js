@@ -1,24 +1,17 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const morgan = require('morgan');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
-const rateLimit = require('express-rate-limit');
+import express from 'express';
+import dotenv from 'dotenv';
+import morgan from 'morgan';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+import rateLimit from 'express-rate-limit';
 
 // Routes Imports
-const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
-const courseRoutes = require('./routes/courseRoutes');
-const lessonRoutes = require('./routes/lessonRoutes');
-const vocabularyRoutes = require('./routes/vocabularyRoutes');
-const exerciseRoutes = require('./routes/exerciseRoutes');
-// const progressRoutes = require('./routes/progress.routes');
-// const notificationRoutes = require('./routes/notification.routes');
+import routes from './routes/index.js';
 
 // Middleware Imports
-const errorHandler = require('./middleware/errorHandler');
+import errorHandler from './middleware/errorHandler.js';
 
 // Load env vars
 dotenv.config();
@@ -26,7 +19,7 @@ dotenv.config();
 // Initialize Express
 const app = express();
 
-// Body parsers and Cookie parser middlewares
+// Body parsers & cookie parser
 app.use(express.json()); // Cho phép đọc data JSON từ body (giống $request->json() trong Laravel)
 app.use(express.urlencoded({ extended: true })); // Cho phép đọc data từ form-urlencoded
 app.use(cookieParser()); // Cho phép đọc cookie từ request
@@ -39,11 +32,13 @@ app.use(cookieParser()); // Cho phép đọc cookie từ request
 // Security middlewares
 // app.use(helmet());
 
-// Enable CORS Cho phép Client gọi API
-app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    credentials: true // Để nhận cookie từ client
-}));
+// Enable CORS
+app.use(
+    cors({
+        origin: process.env.CLIENT_URL || 'http://localhost:5173',
+        credentials: true // Allow cookies to be sent from client
+    })
+);
 
 // Prevent NoSQL injection (Quan trọng với MongoDB)
 // app.use(mongoSanitize());
@@ -66,14 +61,7 @@ app.get('/', (req, res) => {
 });
 
 // API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/courses', courseRoutes);
-app.use('/api/lessons', lessonRoutes);
-app.use('/api/vocabulary', vocabularyRoutes);
-app.use('/api/exercises', exerciseRoutes);
-// app.use('/api/progress', progressRoutes);
-// app.use('/api/notifications', notificationRoutes);
+app.use('/api', routes);
 
 // 404 handler
 app.use((req, res) => {
@@ -83,4 +71,4 @@ app.use((req, res) => {
 // --- Error Handler middleware (Must be last) ---
 app.use(errorHandler);
 
-module.exports = app;
+export default app;

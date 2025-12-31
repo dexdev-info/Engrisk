@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const achievementSchema = new mongoose.Schema({
+const achievementSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -63,5 +63,5 @@ const achievementSchema = new mongoose.Schema({
 achievementSchema.index({ conditionType: 1 });
 achievementSchema.index({ tier: 1 });
 
-const Achievement = mongoose.model('Achievement', achievementSchema);
-module.exports = Achievement;
+const Achievement = model('Achievement', achievementSchema);
+export default Achievement;

@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const vocabularySchema = new mongoose.Schema({
+const vocabularySchema = new Schema({
     word: {
         type: String,
         required: [true, 'Word is required'],
@@ -44,10 +44,10 @@ const vocabularySchema = new mongoose.Schema({
     level: {
         type: String,
         enum: {
-            values: ['beginner', 'intermediate', 'advanced'],
+            values: ['Beginner', 'Intermediate', 'Advanced'],
             message: 'Level must be beginner, intermediate, or advanced'
         },
-        default: 'beginner'
+        default: 'Beginner'
     },
     // Image URL for visual learning
     imageUrl: {
@@ -71,7 +71,7 @@ const vocabularySchema = new mongoose.Schema({
     }],
     // Related words
     relatedWords: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Vocabulary'
     }],
     // Usage count (how many users saved this word)
@@ -89,5 +89,5 @@ vocabularySchema.index({ level: 1 });
 vocabularySchema.index({ partOfSpeech: 1 });
 vocabularySchema.index({ usageCount: -1 });
 
-const Vocabulary = mongoose.model('Vocabulary', vocabularySchema);
-module.exports = Vocabulary;
+const Vocabulary = model('Vocabulary', vocabularySchema);
+export default Vocabulary;

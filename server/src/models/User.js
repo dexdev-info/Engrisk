@@ -1,6 +1,6 @@
 // server/models/User.js
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -109,7 +109,6 @@ userSchema.pre('countDocuments', autoExcludeDeleted);
 /* =======================
     PASSWORD
 ======================= */
-// Hash password before saving
 userSchema.pre('save', async function () {
     if (!this.isModified('password')) return;
 
@@ -119,7 +118,7 @@ userSchema.pre('save', async function () {
 
 // Compare password method
 userSchema.methods.comparePassword = async function (candidatePassword) {
-    return await bcrypt.compare(candidatePassword, this.password);
+    return bcrypt.compare(candidatePassword, this.password);
 };
 
 /* =======================
@@ -143,18 +142,14 @@ userSchema.methods.updateActivity = async function () {
         const dayDiff = Math.floor((today - lastActivity) / (1000 * 60 * 60 * 24));
 
         if (dayDiff === 1) {
-            // Consecutive day
             this.currentStreak += 1;
             if (this.currentStreak > this.longestStreak) {
                 this.longestStreak = this.currentStreak;
             }
         } else if (dayDiff > 1) {
-            // Streak broken
             this.currentStreak = 1;
         }
-        // If dayDiff === 0, same day, no change
     } else {
-        // First activity
         this.currentStreak = 1;
         this.longestStreak = 1;
     }
@@ -168,5 +163,4 @@ userSchema.index({ email: 1, isDeleted: 1 });
 userSchema.index({ role: 1 });
 
 const User = mongoose.model('User', userSchema);
-
-module.exports = User;
+export default User;

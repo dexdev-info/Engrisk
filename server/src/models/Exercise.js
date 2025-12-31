@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const exerciseSchema = new mongoose.Schema({
+const exerciseSchema = new Schema({
     lesson: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Lesson',
         required: [true, 'Lesson reference is required']
     },
@@ -73,7 +73,7 @@ const exerciseSchema = new mongoose.Schema({
     },
     // Related vocabulary (if applicable)
     relatedVocabulary: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Vocabulary'
     }],
     // Statistics
@@ -100,5 +100,5 @@ exerciseSchema.index({ lesson: 1, orderIndex: 1 });
 exerciseSchema.index({ type: 1 });
 exerciseSchema.index({ difficulty: 1 });
 
-const Exercise = mongoose.model('Exercise', exerciseSchema);
-module.exports = Exercise;
+const Exercise = model('Exercise', exerciseSchema);
+export default Exercise;

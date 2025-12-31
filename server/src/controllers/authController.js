@@ -1,5 +1,5 @@
-const authService = require('../services/authService');
-const ErrorResponse = require('../utils/errorResponse');
+import { registerUser, loginUser, refreshAccessToken, logoutUser } from '../services/authService.js';
+import ErrorResponse from '../utils/errorResponse.js';
 
 // Cấu hình Cookie
 const cookieOptions = {
@@ -12,9 +12,12 @@ const cookieOptions = {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 ngày
 };
 
-exports.register = async (req, res, next) => {
+// @desc    Register user
+// @route   POST /api/auth/register
+// @access  Public
+export const register = async (req, res, next) => {
     try {
-        const user = await authService.register(req.body);
+        const user = await registerUser(req.body);
 
         // Đăng ký xong chưa login ngay (tùy logic, ở đây mình trả về success để client tự redirect sang login)
         res.status(201).json({
@@ -27,16 +30,20 @@ exports.register = async (req, res, next) => {
             }
         });
     } catch (error) {
-        next(error);
+        next(error); // Đẩy về errorHandler trung tâm
     }
 };
 
-exports.login = async (req, res, next) => {
+// @desc    Login user
+// @route   POST /api/auth/login
+// @access  Public
+export const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         const ipAddress = req.ip;
 
-        const { user, accessToken, refreshToken } = await authService.login({ email, password, ipAddress });
+        const { user, accessToken, refreshToken } =
+            await loginUser({ email, password, ipAddress });
 
         // Set Refresh Token vào Cookie
         res.cookie('refreshToken', refreshToken, cookieOptions);
@@ -57,7 +64,10 @@ exports.login = async (req, res, next) => {
     }
 };
 
-exports.refreshToken = async (req, res, next) => {
+// @desc    Refresh access token
+// @route   POST /api/auth/refresh-token
+// @access  Public (nhưng cần refresh token trong cookie)
+export const refreshToken = async (req, res, next) => {
     try {
         const token = req.cookies.refreshToken; // Lấy từ Cookie
         const ipAddress = req.ip;
@@ -66,7 +76,7 @@ exports.refreshToken = async (req, res, next) => {
             return next(new ErrorResponse('Refresh Token is required', 400));
         }
 
-        const result = await authService.refreshToken({ token, ipAddress });
+        const result = await refreshAccessToken({ token, ipAddress });
 
         // Update lại Cookie mới (Rotation)
         res.cookie('refreshToken', result.refreshToken, cookieOptions);
@@ -80,17 +90,23 @@ exports.refreshToken = async (req, res, next) => {
     }
 };
 
-exports.logout = async (req, res, next) => {
+// @desc    Logout user
+// @route   POST /api/auth/logout
+// @access  Private (dựa trên refresh token)
+export const logout = async (req, res, next) => {
     try {
         const token = req.cookies.refreshToken;
         const ipAddress = req.ip;
 
         if (token) {
-            await authService.logout(token, ipAddress);
+            await logoutUser(token, ipAddress);
         }
 
         // Xóa cookie
-        res.cookie('refreshToken', '', { ...cookieOptions, expires: new Date(0) });
+        res.cookie('refreshToken', '', {
+            ...cookieOptions,
+            expires: new Date(0)
+        });
 
         res.status(200).json({
             success: true,

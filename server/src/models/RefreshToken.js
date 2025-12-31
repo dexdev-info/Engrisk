@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const refreshTokenSchema = new mongoose.Schema({
+const refreshTokenSchema = new Schema({
     user: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
@@ -40,5 +40,7 @@ refreshTokenSchema.virtual('isActive').get(function () {
     return !this.revoked && !this.isExpired;
 });
 
-const RefreshToken = mongoose.model('RefreshToken', refreshTokenSchema);
-module.exports = RefreshToken;
+refreshTokenSchema.index({ token: 1 });
+
+const RefreshToken = model('RefreshToken', refreshTokenSchema);
+export default RefreshToken;

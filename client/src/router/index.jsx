@@ -10,13 +10,13 @@ import ErrorBoundary from '../components/common/ErrorBoundary';
 import NotFound from '../pages/NotFound';
 
 // Lazy Pages
-// const Dashboard = lazy(() => import('@/pages/Dashboard')); // Chưa có file này thì khoan bật
-const Dashboard = () => <div className="p-6">Dashboard Real Content Coming Soon</div>;
-const Courses = () => <div className="p-6">Courses List Coming Soon</div>;
+const Dashboard = lazy(() => <div className="p-6">Dashboard Real Content Coming Soon</div>);
+import Courses from '../pages/Courses';
+import CourseDetail from '../pages/CourseDetail';
 
 // Auth Pages (Eager load login/register cho nhanh)
-import Login from '@/pages/auth/Login';
-import Register from '@/pages/auth/Register';
+import Login from '../pages/auth/Login';
+import Register from '../pages/auth/Register';
 
 // Loading Fallback
 const Loading = () => (
@@ -33,14 +33,8 @@ const router = createBrowserRouter([
         element: <AuthLayout />,
         errorElement: <ErrorBoundary />, // Bắt lỗi cho cụm này
         children: [
-            {
-                path: 'login',
-                element: <Login />,
-            },
-            {
-                path: 'register',
-                element: <Register />,
-            },
+            { path: 'login', element: <Login /> },
+            { path: 'register', element: <Register /> },
         ],
     },
     {
@@ -53,34 +47,18 @@ const router = createBrowserRouter([
         ),
         errorElement: <ErrorBoundary />,
         children: [
-            {
-                // Redirect root to dashboard
-                index: true,
-                element: <Navigate to="/dashboard" replace />,
-            },
-            {
-                path: 'dashboard',
-                element: <Dashboard />,
-            },
-            {
-                path: 'courses',
-                element: <Courses />,
-            },
-            {
-                path: 'vocabulary',
-                element: <div>Vocabulary Page</div>,
-            },
-            {
-                path: 'profile',
-                element: <div>User Profile</div>,
-            },
+            { index: true, element: <Navigate to="/dashboard" replace /> },
+            { path: 'dashboard', element: <Dashboard /> },
+
+            // Course Routes
+            { path: 'courses', element: <Courses /> },
+            { path: 'courses/:slug', element: <CourseDetail /> }, // Dynamic route
+
+            { path: 'vocabulary', element: <div>Vocabulary Page</div> },
+            { path: 'profile', element: <div>Profile Page</div> },
         ],
     },
-    {
-        // === 404 NOT FOUND ===
-        path: '*',
-        element: <NotFound />,
-    }
+    { path: '*', element: <NotFound /> }
 ]);
 
 export default router;

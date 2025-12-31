@@ -1,20 +1,19 @@
 import api from '../lib/api';
 
 const courseService = {
-    // Lấy tất cả khóa học (Hiện ở trang chủ)
-    getAllCourses: async () => {
+    getAll: async () => {
         const response = await api.get('/courses');
         return response.data;
     },
 
-    // Lấy chi tiết 1 khóa (Kèm bài học)
-    getCourseById: async (id) => {
-        const response = await api.get(`/courses/${id}`);
+    getBySlug: async (slug) => {
+        const response = await api.get(`/courses/${slug}`);
         return response.data;
     },
 
-    getVocabByLesson: async (lessonId) => {
-        const response = await api.get(`/courses/lessons/${lessonId}/vocab`);
+    // Placeholder cho chức năng đăng ký sau này
+    enroll: async (courseId) => {
+        const response = await api.post(`/courses/${courseId}/enroll`);
         return response.data;
     }
 };

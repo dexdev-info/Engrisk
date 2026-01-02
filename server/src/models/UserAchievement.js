@@ -3,45 +3,48 @@
 // ============================================
 import { Schema, model } from 'mongoose';
 
-const userAchievementSchema = new Schema({
+const userAchievementSchema = new Schema(
+  {
     user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
     achievement: {
-        type: Schema.Types.ObjectId,
-        ref: 'Achievement',
-        required: true
+      type: Schema.Types.ObjectId,
+      ref: 'Achievement',
+      required: true,
     },
     unlockedAt: {
-        type: Date,
-        default: Date.now
+      type: Date,
+      default: Date.now,
     },
     // Was notification sent?
     notificationSent: {
-        type: Boolean,
-        default: false
-    }
-}, {
-    timestamps: true
-});
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
 
 // Update achievement unlockedCount after save
 userAchievementSchema.post('save', async function () {
-    const Achievement = model('Achievement');
-    await Achievement.findByIdAndUpdate(this.achievement, {
-        $inc: { unlockedCount: 1 }
-    });
+  const Achievement = model('Achievement');
+  await Achievement.findByIdAndUpdate(this.achievement, {
+    $inc: { unlockedCount: 1 },
+  });
 
-    // Update user total points
-    const achievement = await Achievement.findById(this.achievement);
-    if (achievement) {
-        const User = model('User');
-        await User.findByIdAndUpdate(this.user, {
-            $inc: { totalPoints: achievement.pointsReward }
-        });
-    }
+  // Update user total points
+  const achievement = await Achievement.findById(this.achievement);
+  if (achievement) {
+    const User = model('User');
+    await User.findByIdAndUpdate(this.user, {
+      $inc: { totalPoints: achievement.pointsReward },
+    });
+  }
 });
 
 // Compound unique index

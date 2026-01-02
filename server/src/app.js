@@ -34,10 +34,10 @@ app.use(cookieParser()); // Cho phép đọc cookie từ request
 
 // Enable CORS
 app.use(
-    cors({
-        origin: process.env.CLIENT_URL || 'http://localhost:5173',
-        credentials: true // Allow cookies to be sent from client
-    })
+  cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    credentials: true, // Allow cookies to be sent from client
+  }),
 );
 
 // Prevent NoSQL injection (Quan trọng với MongoDB)
@@ -45,19 +45,19 @@ app.use(
 
 // Rate limiting
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100 // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
 });
 app.use('/api', limiter);
 
 // Health check
 app.get('/health', (req, res) => {
-    res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
 // --- Routes Mounting ---
 app.get('/', (req, res) => {
-    res.send('Engrisk API is running... 🚀');
+  res.send('Engrisk API is running... 🚀');
 });
 
 // API Routes
@@ -65,7 +65,7 @@ app.use('/api', routes);
 
 // 404 handler
 app.use((req, res) => {
-    res.status(404).json({ message: 'Route not found' });
+  res.status(404).json({ message: 'Route not found' });
 });
 
 // --- Error Handler middleware (Must be last) ---

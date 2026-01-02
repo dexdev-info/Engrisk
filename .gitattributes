@@ -1,3 +1,2 @@
-# .gitattributes
 # Ép tất cả file text phải dùng LF, bất kể hệ điều hành nào
 * text=auto eol=lf

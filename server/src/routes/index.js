@@ -13,7 +13,7 @@ const router = express.Router();
 
 // Health check cho API
 router.get('/health', (req, res) => {
-    res.json({ status: 'API OK' });
+  res.json({ status: 'API OK' });
 });
 
 // Mount routes

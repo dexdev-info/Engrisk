@@ -1,6 +1,11 @@
 import express from 'express';
 const router = express.Router();
-import { getVocabularies, toggleSaveVocab, getMyVocabularies, reviewVocab } from '../controllers/vocabularyController.js';
+import {
+  getVocabularies,
+  toggleSaveVocab,
+  getMyVocabularies,
+  reviewVocab,
+} from '../controllers/vocabularyController.js';
 import { protect } from '../middleware/auth.middleware.js';
 
 router.get('/', getVocabularies); // Public Dictionary

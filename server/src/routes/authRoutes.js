@@ -1,6 +1,11 @@
 import express from 'express';
 const router = express.Router();
-import { register, login, refreshToken, logout } from '../controllers/authController.js';
+import {
+  register,
+  login,
+  refreshToken,
+  logout,
+} from '../controllers/authController.js';
 import { protect } from '../middleware/auth.middleware.js';
 // const { validateRegister, validateLogin } = require('../validators/authValidator');
 

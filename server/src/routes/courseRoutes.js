@@ -1,6 +1,10 @@
 import express from 'express';
 const router = express.Router();
-import { getCourses, getCourseBySlug, enrollCourse } from '../controllers/courseController.js';
+import {
+  getCourses,
+  getCourseBySlug,
+  enrollCourse,
+} from '../controllers/courseController.js';
 import { protect } from '../middleware/auth.middleware.js';
 
 // Ai cũng xem được danh sách khóa học

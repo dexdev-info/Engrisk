@@ -11,7 +11,7 @@ const courseService = {
         return response.data;
     },
 
-    // Placeholder cho chức năng đăng ký sau này
+    // API Enroll thật
     enroll: async (courseId) => {
         const response = await api.post(`/courses/${courseId}/enroll`);
         return response.data;

@@ -45,7 +45,7 @@ export const getVocabularies = async (req, res, next) => {
 export const toggleSaveVocab = async (req, res, next) => {
     try {
         const vocabId = req.params.id;
-        
+
         // Check vocab exist
         const vocab = await Vocabulary.findById(vocabId);
         if (!vocab) return next(new ErrorResponse('Từ vựng không tồn tại', 404));
@@ -59,7 +59,7 @@ export const toggleSaveVocab = async (req, res, next) => {
         if (userVocab) {
             // Nếu đã lưu -> Xóa (Unsave)
             await userVocab.deleteOne();
-            
+
             // Giảm usageCount của từ gốc
             await Vocabulary.findByIdAndUpdate(vocabId, { $inc: { usageCount: -1 } });
 
@@ -99,7 +99,7 @@ export const getMyVocabularies = async (req, res, next) => {
         const query = { user: req.user._id };
 
         if (status) query.status = status;
-        
+
         // Logic SRS: Lấy các từ đã đến hạn ôn (nextReviewAt <= now)
         if (due === 'true') {
             query.nextReviewAt = { $lte: new Date() };
@@ -128,7 +128,7 @@ export const reviewVocab = async (req, res, next) => {
         const userVocabId = req.params.id; // ID của UserVocabulary, ko phải Vocab gốc
 
         const userVocab = await UserVocabulary.findById(userVocabId);
-        
+
         if (!userVocab || userVocab.user.toString() !== req.user.id) {
             return next(new ErrorResponse('Không tìm thấy từ vựng trong kho của bạn', 404));
         }

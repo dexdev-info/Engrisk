@@ -15,14 +15,14 @@ export const submitExercise = async (req, res, next) => {
         // Logic chấm điểm đơn giản
         // (Nâng cao: xử lý case-insensitive, trim space...)
         let isCorrect = false;
-        
+
         if (exercise.type === 'multiple_choice') {
             isCorrect = exercise.correctAnswer === userAnswer;
         } else if (exercise.type === 'fill_blank') {
             // Check correct answer OR alternative answers
             const possibleAnswers = [exercise.correctAnswer, ...exercise.alternativeAnswers]
                 .map(a => a.toLowerCase().trim());
-            
+
             isCorrect = possibleAnswers.includes(userAnswer.toLowerCase().trim());
         } else if (exercise.type === 'matching') {
             // Logic matching phức tạp hơn, tạm thời giả sử Client gửi lên true/false đã validate

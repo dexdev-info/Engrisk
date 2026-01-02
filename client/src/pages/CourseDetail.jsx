@@ -4,16 +4,15 @@ import { Typography, Button, Spin, List, Avatar, Tag, Card, Divider, message } f
 import { PlayCircleOutlined, ClockCircleOutlined, CheckCircleOutlined, LockOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import courseService from '../services/courseService.js';
 import { useAuth } from '../hooks/useAuth.js';
-// import { authService } from '../services/authService.js';
-// import { useRevalidator } from 'react-router-dom'; // Nếu dùng data router loader (optional)
+import { authService } from '../services/authService.js';
+import { useRevalidator } from 'react-router-dom'; // Nếu dùng data router loader (optional)
 
 const { Title, Paragraph, Text } = Typography;
 
 const CourseDetail = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
-    // const { user, login } = useAuth();
-    const { user } = useAuth();
+    const { user, login } = useAuth();
 
     const [course, setCourse] = useState(null);
     const [loading, setLoading] = useState(true);

@@ -11,8 +11,6 @@ router.get('/:slug', getCourseBySlug);
 
 // Private routes
 router.post('/:id/enroll', protect, enrollCourse);
-// router.post('/:id/enroll', enrollCourse);
-
 
 // router.get('/lessons/:id/vocab', protect, getVocabByLesson);
 // Note: Nếu muốn check enrollment chính xác ở Backend thì cần middleware optional auth.

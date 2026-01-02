@@ -1,34 +1,34 @@
-import { useEffect, useState } from 'react';
-import { Typography, Row, Col, Spin, Empty, Input } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-import courseService from '../services/courseService.js';
-import CourseCard from '../components/course/CourseCard.jsx';
+import { useEffect, useState } from 'react'
+import { Typography, Row, Col, Spin, Empty, Input } from 'antd'
+import { SearchOutlined } from '@ant-design/icons'
+import courseService from '../services/courseService.js'
+import CourseCard from '../components/course/CourseCard.jsx'
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph } = Typography
 
 const Courses = () => {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [courses, setCourses] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await courseService.getAll();
-        setCourses(res.data);
+        const res = await courseService.getAll()
+        setCourses(res.data)
       } catch (error) {
-        console.error('Failed to fetch courses:', error);
+        console.error('Failed to fetch courses:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchCourses();
-  }, []);
+    }
+    fetchCourses()
+  }, [])
 
   // Filter client-side cho mượt
   const filteredCourses = courses.filter((c) =>
-    c.title.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+    c.title.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto">
@@ -67,7 +67,7 @@ const Courses = () => {
         <Empty description="Chưa có khóa học nào hoặc không tìm thấy kết quả." />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Courses;
+export default Courses

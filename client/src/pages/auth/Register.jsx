@@ -1,36 +1,36 @@
-import { useState } from 'react';
-import { Form, Input, Button, Divider } from 'antd';
+import { useState } from 'react'
+import { Form, Input, Button, Divider } from 'antd'
 import {
   UserOutlined,
   MailOutlined,
   LockOutlined,
-  GoogleOutlined,
-} from '@ant-design/icons';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth.js';
-import { toast } from 'react-toastify';
+  GoogleOutlined
+} from '@ant-design/icons'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../hooks/useAuth.js'
+import { toast } from 'react-toastify'
 
 const Register = () => {
-  const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false)
+  const { register } = useAuth()
+  const navigate = useNavigate()
 
   const onFinish = async (values) => {
-    setLoading(true);
+    setLoading(true)
     try {
       await register({
         name: values.name,
         email: values.email,
-        password: values.password,
-      });
-      toast.success('Đăng ký thành công! Hãy bắt đầu học ngay. 🚀');
-      navigate('/login');
+        password: values.password
+      })
+      toast.success('Đăng ký thành công! Hãy bắt đầu học ngay. 🚀')
+      navigate('/login')
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Đăng ký thất bại');
+      toast.error(error.response?.data?.error || 'Đăng ký thất bại')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="w-full">
@@ -56,8 +56,8 @@ const Register = () => {
             {
               required: true,
               message: 'Vui lòng nhập họ tên!',
-              whitespace: true,
-            },
+              whitespace: true
+            }
           ]}
         >
           <Input
@@ -71,7 +71,7 @@ const Register = () => {
           name="email"
           rules={[
             { type: 'email', message: 'Email không hợp lệ!' },
-            { required: true, message: 'Vui lòng nhập Email!' },
+            { required: true, message: 'Vui lòng nhập Email!' }
           ]}
         >
           <Input
@@ -85,7 +85,7 @@ const Register = () => {
           name="password"
           rules={[
             { required: true, message: 'Vui lòng nhập mật khẩu!' },
-            { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' },
+            { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
           ]}
           hasFeedback
         >
@@ -105,11 +105,11 @@ const Register = () => {
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue('password') === value) {
-                  return Promise.resolve();
+                  return Promise.resolve()
                 }
-                return Promise.reject(new Error('Hai mật khẩu không khớp!'));
-              },
-            }),
+                return Promise.reject(new Error('Hai mật khẩu không khớp!'))
+              }
+            })
           ]}
         >
           <Input.Password
@@ -138,7 +138,7 @@ const Register = () => {
         </Link>
       </p>
     </div>
-  );
-};
+  )
+}
 
-export default Register;
+export default Register

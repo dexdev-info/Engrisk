@@ -1,39 +1,39 @@
-import Exercise from '../models/Exercise.js';
-import ExerciseAttempt from '../models/ExerciseAttempt.js';
-import ErrorResponse from '../utils/errorResponse.js';
+import Exercise from '../models/Exercise.js'
+import ExerciseAttempt from '../models/ExerciseAttempt.js'
+import ErrorResponse from '../utils/errorResponse.js'
 
 // @desc    Submit Exercise Answer
 // @route   POST /api/exercises/:id/submit
 export const submitExercise = async (req, res, next) => {
   try {
-    const exerciseId = req.params.id;
-    const { userAnswer, timeTaken } = req.body;
+    const exerciseId = req.params.id
+    const { userAnswer, timeTaken } = req.body
 
-    const exercise = await Exercise.findById(exerciseId);
-    if (!exercise) return next(new ErrorResponse('Exercise not found', 404));
+    const exercise = await Exercise.findById(exerciseId)
+    if (!exercise) return next(new ErrorResponse('Exercise not found', 404))
 
     // Logic chấm điểm đơn giản
     // (Nâng cao: xử lý case-insensitive, trim space...)
-    let isCorrect = false;
+    let isCorrect = false
 
     if (exercise.type === 'multiple_choice') {
-      isCorrect = exercise.correctAnswer === userAnswer;
+      isCorrect = exercise.correctAnswer === userAnswer
     } else if (exercise.type === 'fill_blank') {
       // Check correct answer OR alternative answers
       const possibleAnswers = [
         exercise.correctAnswer,
-        ...exercise.alternativeAnswers,
-      ].map((a) => a.toLowerCase().trim());
+        ...exercise.alternativeAnswers
+      ].map((a) => a.toLowerCase().trim())
 
-      isCorrect = possibleAnswers.includes(userAnswer.toLowerCase().trim());
+      isCorrect = possibleAnswers.includes(userAnswer.toLowerCase().trim())
     } else if (exercise.type === 'matching') {
       // Logic matching phức tạp hơn, tạm thời giả sử Client gửi lên true/false đã validate
       // Hoặc so sánh JSON string
       isCorrect =
-        JSON.stringify(userAnswer) === JSON.stringify(exercise.correctAnswer);
+        JSON.stringify(userAnswer) === JSON.stringify(exercise.correctAnswer)
     }
 
-    const pointsEarned = isCorrect ? exercise.points : 0;
+    const pointsEarned = isCorrect ? exercise.points : 0
 
     // Lưu lịch sử làm bài
     const attempt = await ExerciseAttempt.create({
@@ -43,8 +43,8 @@ export const submitExercise = async (req, res, next) => {
       userAnswer: JSON.stringify(userAnswer), // Convert to string nếu là object
       isCorrect,
       pointsEarned,
-      timeTaken,
-    });
+      timeTaken
+    })
 
     res.status(200).json({
       success: true,
@@ -52,10 +52,10 @@ export const submitExercise = async (req, res, next) => {
         isCorrect,
         pointsEarned,
         correctAnswer: isCorrect ? null : exercise.correctAnswer, // Chỉ hiện đáp án đúng nếu làm sai (Optional)
-        explanation: exercise.explanation,
-      },
-    });
+        explanation: exercise.explanation
+      }
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}

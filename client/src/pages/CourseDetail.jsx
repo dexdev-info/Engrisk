@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import {
   Typography,
   Button,
@@ -9,45 +9,45 @@ import {
   Tag,
   Card,
   Divider,
-  message,
-} from 'antd';
+  message
+} from 'antd'
 import {
   PlayCircleOutlined,
   ClockCircleOutlined,
   CheckCircleOutlined,
   LockOutlined,
-  ArrowLeftOutlined,
-} from '@ant-design/icons';
-import courseService from '../services/courseService.js';
-import { useAuth } from '../hooks/useAuth.js';
-import { authService } from '../services/authService.js';
-import { useRevalidator } from 'react-router-dom'; // Nếu dùng data router loader (optional)
+  ArrowLeftOutlined
+} from '@ant-design/icons'
+import courseService from '../services/courseService.js'
+import { useAuth } from '../hooks/useAuth.js'
+import { authService } from '../services/authService.js'
+import { useRevalidator } from 'react-router-dom' // Nếu dùng data router loader (optional)
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph, Text } = Typography
 
 const CourseDetail = () => {
-  const { slug } = useParams();
-  const navigate = useNavigate();
-  const { user, login } = useAuth();
+  const { slug } = useParams()
+  const navigate = useNavigate()
+  const { user, login } = useAuth()
 
-  const [course, setCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [enrolling, setEnrolling] = useState(false);
+  const [course, setCourse] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [enrolling, setEnrolling] = useState(false)
 
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const res = await courseService.getBySlug(slug);
-        setCourse(res.data);
+        const res = await courseService.getBySlug(slug)
+        setCourse(res.data)
       } catch (error) {
-        console.error(error);
-        message.error('Không thể tải thông tin khóa học');
+        console.error(error)
+        message.error('Không thể tải thông tin khóa học')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchCourse();
-  }, [slug]);
+    }
+    fetchCourse()
+  }, [slug])
 
   // Note: login() không phù hợp để reload user.
   // Ta nên dùng window.location.reload() hoặc 1 hàm reloadUser() trong context.
@@ -55,15 +55,15 @@ const CourseDetail = () => {
   // Handle Enrollment
   const handleEnroll = async () => {
     if (!user) {
-      message.info('Vui lòng đăng nhập để tham gia khóa học');
-      return navigate('/login', { state: { from: `/courses/${slug}` } });
+      message.info('Vui lòng đăng nhập để tham gia khóa học')
+      return navigate('/login', { state: { from: `/courses/${slug}` } })
     }
 
-    setEnrolling(true);
+    setEnrolling(true)
     try {
       // Gọi API Enroll (Sẽ làm sau)
-      await courseService.enroll(course._id);
-      message.success('Đăng ký thành công! Bắt đầu học thôi.');
+      await courseService.enroll(course._id)
+      message.success('Đăng ký thành công! Bắt đầu học thôi.')
       // Cách nhanh nhất để refresh state: Reload trang để lấy lại User Info mới và Course Detail mới
       // Hoặc pro hơn: navigate tới bài học đầu tiên luôn
 
@@ -72,30 +72,30 @@ const CourseDetail = () => {
         // navigate(`/learn/${course.slug}/${course.lessons[0].slug}`);
 
         // Tạm thời reload để thấy nút đổi trạng thái
-        window.location.reload();
+        window.location.reload()
       } else {
-        window.location.reload();
+        window.location.reload()
       }
     } catch (error) {
-      console.error(error);
-      message.error(error.response?.data?.error || 'Đăng ký thất bại');
+      console.error(error)
+      message.error(error.response?.data?.error || 'Đăng ký thất bại')
     } finally {
-      setEnrolling(false);
+      setEnrolling(false)
     }
-  };
+  }
 
   if (loading)
     return (
       <div className="flex justify-center items-center h-[50vh]">
         <Spin size="large" />
       </div>
-    );
+    )
   if (!course)
-    return <div className="text-center mt-20">Khóa học không tồn tại</div>;
+    return <div className="text-center mt-20">Khóa học không tồn tại</div>
 
   // Check user enrollment locally (Simple check)
   const isEnrolled =
-    user?.enrolledCourses?.includes(course._id) || course.isEnrolled;
+    user?.enrolledCourses?.includes(course._id) || course.isEnrolled
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-8">
@@ -146,12 +146,10 @@ const CourseDetail = () => {
                   }`}
                   onClick={() => {
                     if (isEnrolled) {
-                      message.info(`Đi tới bài học: ${lesson.title}`);
+                      message.info(`Đi tới bài học: ${lesson.title}`)
                       // navigate(...)
                     } else {
-                      message.warning(
-                        'Bạn cần đăng ký khóa học để xem bài này',
-                      );
+                      message.warning('Bạn cần đăng ký khóa học để xem bài này')
                     }
                   }}
                 >
@@ -263,7 +261,7 @@ const CourseDetail = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CourseDetail;
+export default CourseDetail

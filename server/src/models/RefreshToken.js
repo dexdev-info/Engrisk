@@ -1,46 +1,46 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model } from 'mongoose'
 
 const refreshTokenSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    required: true
   },
   token: {
     type: String,
-    required: true,
+    required: true
   },
   expires: {
     type: Date,
-    required: true,
+    required: true
   },
   created: {
     type: Date,
-    default: Date.now,
+    default: Date.now
   },
   createdByIp: {
-    type: String,
+    type: String
   },
   revoked: {
-    type: Date,
+    type: Date
   },
   revokedByIp: {
-    type: String,
+    type: String
   },
   replacedByToken: {
-    type: String,
-  },
-});
+    type: String
+  }
+})
 
 refreshTokenSchema.virtual('isExpired').get(function () {
-  return Date.now() >= this.expires;
-});
+  return Date.now() >= this.expires
+})
 
 refreshTokenSchema.virtual('isActive').get(function () {
-  return !this.revoked && !this.isExpired;
-});
+  return !this.revoked && !this.isExpired
+})
 
-refreshTokenSchema.index({ token: 1 });
+refreshTokenSchema.index({ token: 1 })
 
-const RefreshToken = model('RefreshToken', refreshTokenSchema);
-export default RefreshToken;
+const RefreshToken = model('RefreshToken', refreshTokenSchema)
+export default RefreshToken

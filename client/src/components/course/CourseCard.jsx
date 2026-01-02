@@ -1,23 +1,23 @@
-import { Card, Tag, Badge } from 'antd';
-import { BookOutlined, UserOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Card, Tag, Badge } from 'antd'
+import { BookOutlined, UserOutlined } from '@ant-design/icons'
+import { Link } from 'react-router-dom'
 
-const { Meta } = Card;
+const { Meta } = Card
 
 const CourseCard = ({ course }) => {
   // Map level color
   const getLevelColor = (level) => {
     switch (level) {
       case 'Beginner':
-        return 'green';
+        return 'green'
       case 'Intermediate':
-        return 'blue';
+        return 'blue'
       case 'Advanced':
-        return 'red';
+        return 'red'
       default:
-        return 'default';
+        return 'default'
     }
-  };
+  }
 
   return (
     <Link to={`/courses/${course.slug}`}>
@@ -65,7 +65,7 @@ const CourseCard = ({ course }) => {
         />
       </Card>
     </Link>
-  );
-};
+  )
+}
 
-export default CourseCard;
+export default CourseCard

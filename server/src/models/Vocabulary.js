@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model } from 'mongoose'
 
 const vocabularySchema = new Schema(
   {
@@ -8,31 +8,31 @@ const vocabularySchema = new Schema(
       unique: true,
       trim: true,
       lowercase: true,
-      maxlength: [100, 'Word cannot exceed 100 characters'],
+      maxlength: [100, 'Word cannot exceed 100 characters']
     },
     // Phonetic pronunciation (IPA)
     pronunciation: {
       type: String,
       default: null,
-      trim: true,
+      trim: true
     },
     // Vietnamese meaning
     meaning: {
       type: String,
       required: [true, 'Meaning is required'],
-      maxlength: [500, 'Meaning cannot exceed 500 characters'],
+      maxlength: [500, 'Meaning cannot exceed 500 characters']
     },
     // Example sentence in English
     example: {
       type: String,
       default: null,
-      maxlength: [500, 'Example cannot exceed 500 characters'],
+      maxlength: [500, 'Example cannot exceed 500 characters']
     },
     // Example translation in Vietnamese
     exampleTranslation: {
       type: String,
       default: null,
-      maxlength: [500, 'Example translation cannot exceed 500 characters'],
+      maxlength: [500, 'Example translation cannot exceed 500 characters']
     },
     partOfSpeech: {
       type: String,
@@ -46,67 +46,67 @@ const vocabularySchema = new Schema(
           'preposition',
           'conjunction',
           'interjection',
-          'other',
+          'other'
         ],
-        message: 'Invalid part of speech',
+        message: 'Invalid part of speech'
       },
-      default: 'other',
+      default: 'other'
     },
     level: {
       type: String,
       enum: {
         values: ['Beginner', 'Intermediate', 'Advanced'],
-        message: 'Level must be beginner, intermediate, or advanced',
+        message: 'Level must be beginner, intermediate, or advanced'
       },
-      default: 'Beginner',
+      default: 'Beginner'
     },
     // Image URL for visual learning
     imageUrl: {
       type: String,
-      default: null,
+      default: null
     },
     // Audio URL for pronunciation
     audioUrl: {
       type: String,
-      default: null,
+      default: null
     },
     // Synonyms
     synonyms: [
       {
         type: String,
-        trim: true,
-      },
+        trim: true
+      }
     ],
     // Antonyms
     antonyms: [
       {
         type: String,
-        trim: true,
-      },
+        trim: true
+      }
     ],
     // Related words
     relatedWords: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'Vocabulary',
-      },
+        ref: 'Vocabulary'
+      }
     ],
     // Usage count (how many users saved this word)
     usageCount: {
       type: Number,
-      default: 0,
-    },
+      default: 0
+    }
   },
   {
-    timestamps: true,
-  },
-);
+    timestamps: true
+  }
+)
 
 // Indexes
-vocabularySchema.index({ word: 1 });
-vocabularySchema.index({ level: 1 });
-vocabularySchema.index({ partOfSpeech: 1 });
-vocabularySchema.index({ usageCount: -1 });
+vocabularySchema.index({ word: 1 })
+vocabularySchema.index({ level: 1 })
+vocabularySchema.index({ partOfSpeech: 1 })
+vocabularySchema.index({ usageCount: -1 })
 
-const Vocabulary = model('Vocabulary', vocabularySchema);
-export default Vocabulary;
+const Vocabulary = model('Vocabulary', vocabularySchema)
+export default Vocabulary

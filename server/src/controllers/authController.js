@@ -2,9 +2,9 @@ import {
   registerUser,
   loginUser,
   refreshAccessToken,
-  logoutUser,
-} from '../services/authService.js';
-import ErrorResponse from '../utils/errorResponse.js';
+  logoutUser
+} from '../services/authService.js'
+import ErrorResponse from '../utils/errorResponse.js'
 
 // Cấu hình Cookie
 const cookieOptions = {
@@ -14,15 +14,15 @@ const cookieOptions = {
   sameSite: 'lax', // Chuẩn SPA cross-site request, nếu để 'strict'
   // hoặc 'none' sẽ không hoạt động nếu khác domain
   // lên production dùng 'none'.
-  expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 ngày
-};
+  expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 ngày
+}
 
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
 export const register = async (req, res, next) => {
   try {
-    const user = await registerUser(req.body);
+    const user = await registerUser(req.body)
 
     // Đăng ký xong chưa login ngay (tùy logic, ở đây mình trả về success để client tự redirect sang login)
     res.status(201).json({
@@ -31,30 +31,30 @@ export const register = async (req, res, next) => {
       data: {
         id: user._id,
         name: user.name,
-        email: user.email,
-      },
-    });
+        email: user.email
+      }
+    })
   } catch (error) {
-    next(error); // Đẩy về errorHandler trung tâm
+    next(error) // Đẩy về errorHandler trung tâm
   }
-};
+}
 
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    const ipAddress = req.ip;
+    const { email, password } = req.body
+    const ipAddress = req.ip
 
     const { user, accessToken, refreshToken } = await loginUser({
       email,
       password,
-      ipAddress,
-    });
+      ipAddress
+    })
 
     // Set Refresh Token vào Cookie
-    res.cookie('refreshToken', refreshToken, cookieOptions);
+    res.cookie('refreshToken', refreshToken, cookieOptions)
 
     res.status(200).json({
       success: true,
@@ -64,63 +64,63 @@ export const login = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        avatar: user.avatar,
-      },
-    });
+        avatar: user.avatar
+      }
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 // @desc    Refresh access token
 // @route   POST /api/auth/refresh-token
 // @access  Public (nhưng cần refresh token trong cookie)
 export const refreshToken = async (req, res, next) => {
   try {
-    const token = req.cookies.refreshToken; // Lấy từ Cookie
-    const ipAddress = req.ip;
+    const token = req.cookies.refreshToken // Lấy từ Cookie
+    const ipAddress = req.ip
 
     if (!token) {
-      return next(new ErrorResponse('Refresh Token is required', 400));
+      return next(new ErrorResponse('Refresh Token is required', 400))
     }
 
-    const result = await refreshAccessToken({ token, ipAddress });
+    const result = await refreshAccessToken({ token, ipAddress })
 
     // Update lại Cookie mới (Rotation)
-    res.cookie('refreshToken', result.refreshToken, cookieOptions);
+    res.cookie('refreshToken', result.refreshToken, cookieOptions)
 
     res.status(200).json({
       success: true,
-      accessToken: result.accessToken,
-    });
+      accessToken: result.accessToken
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 // @desc    Logout user
 // @route   POST /api/auth/logout
 // @access  Private (dựa trên refresh token)
 export const logout = async (req, res, next) => {
   try {
-    const token = req.cookies.refreshToken;
-    const ipAddress = req.ip;
+    const token = req.cookies.refreshToken
+    const ipAddress = req.ip
 
     if (token) {
-      await logoutUser(token, ipAddress);
+      await logoutUser(token, ipAddress)
     }
 
     // Xóa cookie
     res.cookie('refreshToken', '', {
       ...cookieOptions,
-      expires: new Date(0),
-    });
+      expires: new Date(0)
+    })
 
     res.status(200).json({
       success: true,
-      message: 'Đăng xuất thành công',
-    });
+      message: 'Đăng xuất thành công'
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}

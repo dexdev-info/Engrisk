@@ -1,31 +1,31 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { Spin } from 'antd';
-import { Suspense, lazy } from 'react';
+import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { Spin } from 'antd'
+import { Suspense, lazy } from 'react'
 // import { RequireAuth } from './requireAuth.js';
 
 // Layouts
-import MainLayout from '../components/layouts/MainLayout';
-import AuthLayout from '../components/layouts/AuthLayout';
-import ErrorBoundary from '../components/common/ErrorBoundary';
-import NotFound from '../pages/NotFound';
+import MainLayout from '../components/layouts/MainLayout'
+import AuthLayout from '../components/layouts/AuthLayout'
+import ErrorBoundary from '../components/common/ErrorBoundary'
+import NotFound from '../pages/NotFound'
 
 // Lazy Pages
 const Dashboard = lazy(() => (
   <div className="p-6">Dashboard Real Content Coming Soon</div>
-));
-import Courses from '../pages/Courses';
-import CourseDetail from '../pages/CourseDetail';
+))
+import Courses from '../pages/Courses'
+import CourseDetail from '../pages/CourseDetail'
 
 // Auth Pages (Eager load login/register cho nhanh)
-import Login from '../pages/auth/Login';
-import Register from '../pages/auth/Register';
+import Login from '../pages/auth/Login'
+import Register from '../pages/auth/Register'
 
 // Loading Fallback
 const Loading = () => (
   <div className="flex justify-center items-center h-screen">
     <Spin size="large" tip="Đang tải..." />
   </div>
-);
+)
 
 // Router Configuration
 const router = createBrowserRouter([
@@ -36,8 +36,8 @@ const router = createBrowserRouter([
     errorElement: <ErrorBoundary />, // Bắt lỗi cho cụm này
     children: [
       { path: 'login', element: <Login /> },
-      { path: 'register', element: <Register /> },
-    ],
+      { path: 'register', element: <Register /> }
+    ]
   },
   {
     // === APP ROUTES (PROTECTED) ===
@@ -57,10 +57,10 @@ const router = createBrowserRouter([
       { path: 'courses/:slug', element: <CourseDetail /> }, // Dynamic route
 
       { path: 'vocabulary', element: <div>Vocabulary Page</div> },
-      { path: 'profile', element: <div>Profile Page</div> },
-    ],
+      { path: 'profile', element: <div>Profile Page</div> }
+    ]
   },
-  { path: '*', element: <NotFound /> },
-]);
+  { path: '*', element: <NotFound /> }
+])
 
-export default router;
+export default router

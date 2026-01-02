@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model } from 'mongoose'
 
 const achievementSchema = new Schema(
   {
@@ -6,16 +6,16 @@ const achievementSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-      maxlength: [100, 'Name cannot exceed 100 characters'],
+      maxlength: [100, 'Name cannot exceed 100 characters']
     },
     description: {
       type: String,
       required: true,
-      maxlength: [500, 'Description cannot exceed 500 characters'],
+      maxlength: [500, 'Description cannot exceed 500 characters']
     },
     icon: {
       type: String,
-      default: '🏆',
+      default: '🏆'
     },
     // Condition to unlock achievement
     conditionType: {
@@ -28,43 +28,43 @@ const achievementSchema = new Schema(
           'exercises_completed',
           'courses_completed',
           'points_earned',
-          'perfect_score',
+          'perfect_score'
         ],
-        message: 'Invalid condition type',
+        message: 'Invalid condition type'
       },
-      required: true,
+      required: true
     },
     conditionValue: {
       type: Number,
       required: true,
-      min: 1,
+      min: 1
     },
     // Badge tier
     tier: {
       type: String,
       enum: ['bronze', 'silver', 'gold', 'platinum'],
-      default: 'bronze',
+      default: 'bronze'
     },
     // Points awarded when unlocked
     pointsReward: {
       type: Number,
       default: 100,
-      min: 0,
+      min: 0
     },
     // How many users unlocked this
     unlockedCount: {
       type: Number,
-      default: 0,
-    },
+      default: 0
+    }
   },
   {
-    timestamps: true,
-  },
-);
+    timestamps: true
+  }
+)
 
 // Indexes
-achievementSchema.index({ conditionType: 1 });
-achievementSchema.index({ tier: 1 });
+achievementSchema.index({ conditionType: 1 })
+achievementSchema.index({ tier: 1 })
 
-const Achievement = model('Achievement', achievementSchema);
-export default Achievement;
+const Achievement = model('Achievement', achievementSchema)
+export default Achievement

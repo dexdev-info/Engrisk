@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState } from 'react'
 
 const Flashcard = ({ vocab }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false)
 
   return (
     <div
@@ -28,7 +28,7 @@ const Flashcard = ({ vocab }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Flashcard;
+export default Flashcard

@@ -1,5 +1,5 @@
-import { Schema, model } from 'mongoose';
-import slugify from 'slugify';
+import { Schema, model } from 'mongoose'
+import slugify from 'slugify'
 
 const courseSchema = Schema(
   {
@@ -7,140 +7,140 @@ const courseSchema = Schema(
       type: String,
       required: [true, 'Course title is required'],
       trim: true,
-      maxlength: [100, 'Title cannot exceed 100 characters'],
+      maxlength: [100, 'Title cannot exceed 100 characters']
     },
     slug: {
       type: String,
       unique: true,
-      lowercase: true,
+      lowercase: true
     },
     description: {
       type: String,
       required: [true, 'Description is required'],
-      maxlength: [1000, 'Description cannot exceed 1000 characters'],
+      maxlength: [1000, 'Description cannot exceed 1000 characters']
     },
     thumbnail: {
       type: String, // Link ảnh (để string cho nhẹ, sau này tính sau)
-      default: null,
+      default: null
     },
     level: {
       type: String,
       enum: {
         values: ['Beginner', 'Intermediate', 'Advanced'],
-        message: 'Level must be beginner, intermediate, or advanced',
+        message: 'Level must be beginner, intermediate, or advanced'
       },
-      default: 'Beginner',
+      default: 'Beginner'
     },
     isPublished: {
       type: Boolean,
-      default: false,
+      default: false
     },
     orderIndex: {
       type: Number,
-      default: 0,
+      default: 0
     },
     // Quan hệ: Một khóa học do ai tạo? (Optional: nếu muốn mở rộng cho giảng viên)
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: true
     },
     // Cached counts for performance
     lessonsCount: {
       type: Number,
-      default: 0,
+      default: 0
     },
     enrolledCount: {
       type: Number,
-      default: 0,
+      default: 0
     },
     // Estimated duration in hours
     estimatedDuration: {
       type: Number,
-      default: 0,
+      default: 0
     },
     // ===== Soft Delete =====
     isDeleted: {
       type: Boolean,
       default: false,
-      index: true,
+      index: true
     },
     deletedAt: {
       type: Date,
-      default: null,
-    },
+      default: null
+    }
   },
   {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  },
-);
+    toObject: { virtuals: true }
+  }
+)
 
 // Virtual populate lessons
 courseSchema.virtual('lessons', {
   ref: 'Lesson',
   localField: '_id',
   foreignField: 'course',
-  options: { sort: { orderIndex: 1 } },
-});
+  options: { sort: { orderIndex: 1 } }
+})
 
 /* =======================
     QUERY FILTER
 ======================= */
 function autoExcludeDeleted() {
-  this.where({ isDeleted: false });
+  this.where({ isDeleted: false })
 }
 
-courseSchema.pre('find', autoExcludeDeleted);
-courseSchema.pre('findOne', autoExcludeDeleted);
-courseSchema.pre('countDocuments', autoExcludeDeleted);
+courseSchema.pre('find', autoExcludeDeleted)
+courseSchema.pre('findOne', autoExcludeDeleted)
+courseSchema.pre('countDocuments', autoExcludeDeleted)
 
 /* =======================
     SLUG
 ======================= */
 courseSchema.pre('save', function () {
-  if (!this.isModified('title')) return;
+  if (!this.isModified('title')) return
 
   this.slug = slugify(this.title, {
     lower: true,
     strict: true,
-    remove: /[*+~.()'"!:@]/g,
-  });
-});
+    remove: /[*+~.()'"!:@]/g
+  })
+})
 
 /* =======================
     LESSON COUNT
 ======================= */
 courseSchema.methods.updateLessonsCount = async function () {
-  const Lesson = model('Lesson');
+  const Lesson = model('Lesson')
   this.lessonsCount = await Lesson.countDocuments({
     course: this._id,
-    isDeleted: false,
-  });
-  await this.save();
-};
+    isDeleted: false
+  })
+  await this.save()
+}
 
 /* =======================
     SOFT DELETE (CASCADE)
 ======================= */
 courseSchema.methods.softDelete = async function () {
-  const Lesson = model('Lesson');
+  const Lesson = model('Lesson')
 
   await Lesson.updateMany(
     { course: this._id },
-    { isDeleted: true, deletedAt: new Date() },
-  );
+    { isDeleted: true, deletedAt: new Date() }
+  )
 
-  this.isDeleted = true;
-  this.deletedAt = new Date();
-  await this.save();
-};
+  this.isDeleted = true
+  this.deletedAt = new Date()
+  await this.save()
+}
 
 // Indexes
-courseSchema.index({ slug: 1 });
-courseSchema.index({ level: 1, isPublished: 1 });
-courseSchema.index({ createdBy: 1 });
+courseSchema.index({ slug: 1 })
+courseSchema.index({ level: 1, isPublished: 1 })
+courseSchema.index({ createdBy: 1 })
 
-const Course = model('Course', courseSchema);
-export default Course;
+const Course = model('Course', courseSchema)
+export default Course

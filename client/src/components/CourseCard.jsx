@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'
 
 const CourseCard = ({ course }) => {
   return (
@@ -48,7 +48,7 @@ const CourseCard = ({ course }) => {
         </Link>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CourseCard;
+export default CourseCard

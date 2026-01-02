@@ -1,28 +1,28 @@
-import { useState } from 'react';
+import { useState } from 'react'
 // eslint-disable-next-line no-unused-vars
-import { Form, Input, Button, Checkbox, Divider, message } from 'antd';
-import { UserOutlined, LockOutlined, GoogleOutlined } from '@ant-design/icons';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth.js';
-import { toast } from 'react-toastify';
+import { Form, Input, Button, Checkbox, Divider, message } from 'antd'
+import { UserOutlined, LockOutlined, GoogleOutlined } from '@ant-design/icons'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../hooks/useAuth.js'
+import { toast } from 'react-toastify'
 
 const Login = () => {
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false)
+  const { login } = useAuth()
+  const navigate = useNavigate()
 
   const onFinish = async (values) => {
-    setLoading(true);
+    setLoading(true)
     try {
-      await login(values.email, values.password);
-      toast.success('Đăng nhập thành công! 🎉');
-      navigate('/dashboard');
+      await login(values.email, values.password)
+      toast.success('Đăng nhập thành công! 🎉')
+      navigate('/dashboard')
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Đăng nhập thất bại');
+      toast.error(error.response?.data?.error || 'Đăng nhập thất bại')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="w-full">
@@ -45,7 +45,7 @@ const Login = () => {
           name="email"
           rules={[
             { required: true, message: 'Vui lòng nhập Email!' },
-            { type: 'email', message: 'Email không hợp lệ!' },
+            { type: 'email', message: 'Email không hợp lệ!' }
           ]}
         >
           <Input
@@ -108,7 +108,7 @@ const Login = () => {
         </Link>
       </p>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

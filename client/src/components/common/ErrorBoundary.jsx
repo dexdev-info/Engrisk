@@ -1,9 +1,9 @@
-import { useRouteError, Link } from 'react-router-dom';
-import { Result, Button } from 'antd';
+import { useRouteError, Link } from 'react-router-dom'
+import { Result, Button } from 'antd'
 
 const ErrorBoundary = () => {
-  const error = useRouteError();
-  console.error(error);
+  const error = useRouteError()
+  console.error(error)
 
   // Dùng Result của Ant Design để hiển thị lỗi 404 hoặc 500 đẹp đẽ.
   return (
@@ -25,7 +25,7 @@ const ErrorBoundary = () => {
         }
       />
     </div>
-  );
-};
+  )
+}
 
-export default ErrorBoundary;
+export default ErrorBoundary

@@ -1,20 +1,20 @@
-import { useState } from 'react';
-import { Layout, theme } from 'antd';
-import { Outlet } from 'react-router-dom';
-import Sidebar from '../common/Sidebar.jsx';
-import AppHeader from '../common/Header.jsx';
-import { useAuth } from '../../hooks/useAuth.js';
+import { useState } from 'react'
+import { Layout, theme } from 'antd'
+import { Outlet } from 'react-router-dom'
+import Sidebar from '../common/Sidebar.jsx'
+import AppHeader from '../common/Header.jsx'
+import { useAuth } from '../../hooks/useAuth.js'
 
-const { Content } = Layout;
+const { Content } = Layout
 
 const MainLayout = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(false)
   const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
+    token: { colorBgContainer, borderRadiusLG }
+  } = theme.useToken()
 
-  const { loading } = useAuth();
-  if (loading) return null; // hoặc spinner
+  const { loading } = useAuth()
+  if (loading) return null // hoặc spinner
 
   return (
     <Layout className="min-h-screen">
@@ -23,7 +23,7 @@ const MainLayout = () => {
         style={{
           marginLeft: collapsed ? 80 : 240,
           transition: 'all 0.2s',
-          minHeight: '100vh',
+          minHeight: '100vh'
         }}
       >
         <AppHeader collapsed={collapsed} setCollapsed={setCollapsed} />
@@ -34,7 +34,7 @@ const MainLayout = () => {
             padding: 24,
             minHeight: 280,
             background: colorBgContainer,
-            borderRadius: borderRadiusLG,
+            borderRadius: borderRadiusLG
           }}
         >
           {/* Outlet là nơi nội dung các trang con (Dashboard, Courses...) hiển thị */}
@@ -42,7 +42,7 @@ const MainLayout = () => {
         </Content>
       </Layout>
     </Layout>
-  );
-};
+  )
+}
 
-export default MainLayout;
+export default MainLayout

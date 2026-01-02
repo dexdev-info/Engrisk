@@ -1,46 +1,46 @@
-import { Layout, Menu } from 'antd';
+import { Layout, Menu } from 'antd'
 import {
   DashboardOutlined,
   ReadOutlined,
   BookOutlined,
   TrophyOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import { useLocation, useNavigate } from 'react-router-dom';
+  UserOutlined
+} from '@ant-design/icons'
+import { useLocation, useNavigate } from 'react-router-dom'
 
-const { Sider } = Layout;
+const { Sider } = Layout
 
 const Sidebar = ({ collapsed }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const menuItems = [
     {
       key: '/dashboard',
       icon: <DashboardOutlined />,
-      label: 'Tổng quan',
+      label: 'Tổng quan'
     },
     {
       key: '/courses',
       icon: <ReadOutlined />,
-      label: 'Khóa học',
+      label: 'Khóa học'
     },
     {
       key: '/vocabulary',
       icon: <BookOutlined />,
-      label: 'Từ vựng',
+      label: 'Từ vựng'
     },
     {
       key: '/achievements',
       icon: <TrophyOutlined />,
-      label: 'Thành tích',
+      label: 'Thành tích'
     },
     {
       key: '/profile',
       icon: <UserOutlined />,
-      label: 'Hồ sơ',
-    },
-  ];
+      label: 'Hồ sơ'
+    }
+  ]
 
   return (
     <Sider
@@ -57,7 +57,7 @@ const Sidebar = ({ collapsed }) => {
         top: 0,
         bottom: 0,
         boxShadow: '2px 0 8px #f0f1f2',
-        zIndex: 2,
+        zIndex: 2
       }}
     >
       {/* Logo Area */}
@@ -80,7 +80,7 @@ const Sidebar = ({ collapsed }) => {
         style={{ borderRight: 0 }}
       />
     </Sider>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

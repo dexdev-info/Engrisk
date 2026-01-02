@@ -1,6 +1,6 @@
 // server/models/User.js
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose'
+import bcrypt from 'bcryptjs'
 
 const userSchema = new mongoose.Schema(
   {
@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Name is required'],
       trim: true,
       minlength: [2, 'Name must be at least 2 characters'],
-      maxlength: [50, 'Name cannot exceed 50 characters'],
+      maxlength: [50, 'Name cannot exceed 50 characters']
     },
     email: {
       type: String,
@@ -17,157 +17,157 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email'],
+      match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email']
     },
     password: {
       type: String,
       required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters'],
-      select: false, // Don't include password in queries by default
+      select: false // Don't include password in queries by default
     },
     avatar: {
       type: String,
-      default: null,
+      default: null
     },
     role: {
       type: String,
       enum: ['user', 'admin'],
-      default: 'user',
+      default: 'user'
     },
     isVerified: {
       type: Boolean,
-      default: false,
+      default: false
     },
     // Enrolled courses (for quick access)
     enrolledCourses: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Course',
-      },
+        ref: 'Course'
+      }
     ],
     // Learning streak tracking
     currentStreak: {
       type: Number,
-      default: 0,
+      default: 0
     },
     longestStreak: {
       type: Number,
-      default: 0,
+      default: 0
     },
     lastActivityDate: {
       type: Date,
-      default: null,
+      default: null
     },
     // Total statistics
     totalLessonsCompleted: {
       type: Number,
-      default: 0,
+      default: 0
     },
     totalExercisesCompleted: {
       type: Number,
-      default: 0,
+      default: 0
     },
     totalVocabulariesMastered: {
       type: Number,
-      default: 0,
+      default: 0
     },
     totalPoints: {
       type: Number,
-      default: 0,
+      default: 0
     },
     // ===== Soft Delete =====
     isDeleted: {
       type: Boolean,
       default: false,
-      index: true,
+      index: true
     },
     deletedAt: {
       type: Date,
-      default: null,
-    },
+      default: null
+    }
   },
   {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  },
-);
+    toObject: { virtuals: true }
+  }
+)
 
 // Virtual for user achievements
 userSchema.virtual('achievements', {
   ref: 'UserAchievement',
   localField: '_id',
-  foreignField: 'user',
-});
+  foreignField: 'user'
+})
 
 /* =======================
     GLOBAL QUERY FILTER
 ======================= */
 function autoExcludeDeleted() {
-  this.where({ isDeleted: false });
+  this.where({ isDeleted: false })
 }
 
-userSchema.pre('find', autoExcludeDeleted);
-userSchema.pre('findOne', autoExcludeDeleted);
-userSchema.pre('countDocuments', autoExcludeDeleted);
+userSchema.pre('find', autoExcludeDeleted)
+userSchema.pre('findOne', autoExcludeDeleted)
+userSchema.pre('countDocuments', autoExcludeDeleted)
 
 /* =======================
     PASSWORD
 ======================= */
 userSchema.pre('save', async function () {
-  if (!this.isModified('password')) return;
+  if (!this.isModified('password')) return
 
-  const salt = await bcrypt.genSalt(12);
-  this.password = await bcrypt.hash(this.password, salt);
-});
+  const salt = await bcrypt.genSalt(12)
+  this.password = await bcrypt.hash(this.password, salt)
+})
 
 // Compare password method
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
-};
+  return bcrypt.compare(candidatePassword, this.password)
+}
 
 /* =======================
     SOFT DELETE METHOD
 ======================= */
 userSchema.methods.softDelete = async function () {
-  this.isDeleted = true;
-  this.deletedAt = new Date();
-  await this.save();
-};
+  this.isDeleted = true
+  this.deletedAt = new Date()
+  await this.save()
+}
 
 // Update activity date and streak
 userSchema.methods.updateActivity = async function () {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
 
   const lastActivity = this.lastActivityDate
     ? new Date(this.lastActivityDate)
-    : null;
+    : null
 
   if (lastActivity) {
-    lastActivity.setHours(0, 0, 0, 0);
-    const dayDiff = Math.floor((today - lastActivity) / (1000 * 60 * 60 * 24));
+    lastActivity.setHours(0, 0, 0, 0)
+    const dayDiff = Math.floor((today - lastActivity) / (1000 * 60 * 60 * 24))
 
     if (dayDiff === 1) {
-      this.currentStreak += 1;
+      this.currentStreak += 1
       if (this.currentStreak > this.longestStreak) {
-        this.longestStreak = this.currentStreak;
+        this.longestStreak = this.currentStreak
       }
     } else if (dayDiff > 1) {
-      this.currentStreak = 1;
+      this.currentStreak = 1
     }
   } else {
-    this.currentStreak = 1;
-    this.longestStreak = 1;
+    this.currentStreak = 1
+    this.longestStreak = 1
   }
 
-  this.lastActivityDate = new Date();
-  await this.save();
-};
+  this.lastActivityDate = new Date()
+  await this.save()
+}
 
 // Indexes
-userSchema.index({ email: 1, isDeleted: 1 });
-userSchema.index({ role: 1 });
+userSchema.index({ email: 1, isDeleted: 1 })
+userSchema.index({ role: 1 })
 
-const User = mongoose.model('User', userSchema);
-export default User;
+const User = mongoose.model('User', userSchema)
+export default User

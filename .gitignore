@@ -1,24 +1,52 @@
-# Logs
-logs
-*.log
+# =========================
+# 1. BẢO MẬT (QUAN TRỌNG NHẤT)
+# =========================
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Trừ file .env.example (để làm mẫu cho người khác)
+!.env.example
+
+# =========================
+# 2. DEPENDENCIES & LOGS
+# =========================
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# =========================
+# 3. BUILD OUTPUT (Rác khi build)
+# =========================
+dist/
+dist-ssr/
+build/
+coverage/   # Folder kết quả test (nếu có)
 *.local
 
-# Editor directories and files
+# =========================
+# 4. IDE & EDITOR (Đã sửa lại chuẩn)
+# =========================
 .vscode/*
+# Cho phép commit những file cấu hình chung này:
+!.vscode/settings.json
 !.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# =========================
+# 5. HỆ ĐIỀU HÀNH (Rác hệ thống)
+# =========================
+.DS_Store
+Thumbs.db

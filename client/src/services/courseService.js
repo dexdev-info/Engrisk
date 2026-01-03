@@ -11,7 +11,7 @@ const courseService = {
     return response.data
   },
 
-  // API Enroll thật
+  // API Enroll
   enroll: async (courseId) => {
     const response = await api.post(`/courses/${courseId}/enroll`)
     return response.data

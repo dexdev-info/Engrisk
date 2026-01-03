@@ -1,10 +1,7 @@
 import Course from '../models/Course.js'
-import CourseEnrollment from '../models/CourseEnrollment.js' // Để check xem user đã đăng ký chưa
+import CourseEnrollment from '../models/CourseEnrollment.js'
 import ErrorResponse from '../utils/errorResponse.js'
 
-// @desc    Get all public courses
-// @route   GET /api/courses
-// @access  Public
 export const getCourses = async (req, res, next) => {
   try {
     const courses = await Course.find({
@@ -26,9 +23,6 @@ export const getCourses = async (req, res, next) => {
   }
 }
 
-// @desc    Get single course by slug
-// @route   GET /api/courses/:slug
-// @access  Public (nhưng nếu login rồi thì trả thêm info enrollment)
 export const getCourseBySlug = async (req, res, next) => {
   try {
     const course = await Course.findOne({
@@ -46,21 +40,32 @@ export const getCourseBySlug = async (req, res, next) => {
       return next(new ErrorResponse('Khóa học không tồn tại', 404))
     }
 
-    // Check enrollment status (nếu user đã login)
+    // Check enrollment status (nếu đã login)
     let isEnrolled = false
-    if (req.user) {
+    let enrollmentData = null
+
+    if (req.user && req.user._id) {
       const enrollment = await CourseEnrollment.findOne({
         user: req.user._id,
         course: course._id
-      })
-      if (enrollment) isEnrolled = true
+      }).select('progressPercentage lastLessonAccessed enrolledAt')
+
+      if (enrollment) {
+        isEnrolled = true
+        enrollmentData = {
+          progressPercentage: enrollment.progressPercentage,
+          lastLessonAccessed: enrollment.lastLessonAccessed,
+          enrolledAt: enrollment.enrolledAt
+        }
+      }
     }
 
     res.status(200).json({
       success: true,
       data: {
         ...course.toObject(),
-        isEnrolled
+        isEnrolled,
+        enrollmentData
       }
     })
   } catch (error) {
@@ -68,9 +73,6 @@ export const getCourseBySlug = async (req, res, next) => {
   }
 }
 
-// @desc    Enroll in a course
-// @route   POST /api/courses/:id/enroll
-// @access  Private
 export const enrollCourse = async (req, res, next) => {
   try {
     const courseId = req.params.id
@@ -98,14 +100,21 @@ export const enrollCourse = async (req, res, next) => {
 
     // 3. Tạo enrollment mới
     // (Middleware 'save' trong Model sẽ tự update User.enrolledCourses và Course.enrolledCount)
-    await CourseEnrollment.create({
+    const enrollment = await CourseEnrollment.create({
       user: userId,
       course: courseId
     })
 
     res.status(200).json({
       success: true,
-      message: 'Đăng ký khóa học thành công!'
+      message: 'Đăng ký khóa học thành công!',
+      data: {
+        courseId,
+        enrollment: {
+          progressPercentage: enrollment.progressPercentage,
+          enrolledAt: enrollment.enrolledAt
+        }
+      }
     })
   } catch (error) {
     next(error)

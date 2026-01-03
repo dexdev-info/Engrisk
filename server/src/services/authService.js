@@ -6,9 +6,6 @@ import {
   generateRefreshTokenString
 } from '../utils/token.utils.js'
 
-/**
- * Register Service
- */
 export const registerUser = async (userData) => {
   const { name, email, password } = userData
 
@@ -28,9 +25,6 @@ export const registerUser = async (userData) => {
   return user
 }
 
-/**
- * Login Service
- */
 export const loginUser = async ({ email, password, ipAddress }) => {
   const user = await User.findOne({ email }).select('+password')
 
@@ -101,9 +95,6 @@ export const refreshAccessToken = async ({ token, ipAddress }) => {
   }
 }
 
-/**
- * Logout Service
- */
 export const logoutUser = async (token, ipAddress) => {
   const refreshTokenDoc = await RefreshToken.findOne({ token })
 

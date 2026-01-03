@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd'
+import { App as AntdApp, ConfigProvider } from 'antd'
 import { RouterProvider } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -15,11 +15,12 @@ function App() {
         }
       }}
     >
-      {/* Bọc AuthProvider ngoài RouterProvider */}
-      <AuthProvider>
-        <RouterProvider router={router} />
-        <ToastContainer position="top-right" autoClose={3000} />
-      </AuthProvider>
+      <AntdApp>
+        <AuthProvider>
+          <RouterProvider router={router} />
+          <ToastContainer position="top-right" autoClose={3000} />
+        </AuthProvider>
+      </AntdApp>
     </ConfigProvider>
   )
 }

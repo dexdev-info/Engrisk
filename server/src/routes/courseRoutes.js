@@ -1,23 +1,22 @@
 import express from 'express'
-const router = express.Router()
 import {
   getCourses,
   getCourseBySlug,
   enrollCourse
 } from '../controllers/courseController.js'
-import { protect } from '../middleware/auth.middleware.js'
+import { protect, optionalAuth } from '../middleware/auth.middleware.js'
 
-// Ai cũng xem được danh sách khóa học
+const router = express.Router()
+
+// Public routes (không cần login)
 router.get('/', getCourses)
 
-// Nhưng muốn xem chi tiết (để học) thì phải Login
-router.get('/:slug', getCourseBySlug)
+// Dùng optionalAuth cho course detail
+router.get('/:slug', optionalAuth, getCourseBySlug)
 
-// Private routes
+// Protected routes (cần login)
 router.post('/:id/enroll', protect, enrollCourse)
 
 // router.get('/lessons/:id/vocab', protect, getVocabByLesson);
-// Note: Nếu muốn check enrollment chính xác ở Backend thì cần middleware optional auth.
-// Nhưng ở Frontend mình check theo list enrolledCourses trong User Profile cũng được.
 
 export default router

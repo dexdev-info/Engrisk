@@ -1,5 +1,13 @@
 import axios from 'axios'
 
+const api = axios.create({
+  baseURL: '/api',
+  withCredentials: true, // ! Quan trọng: Để gửi kèm Cookie (RefreshToken)
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+
 // Biến lưu Access Token trong RAM (Closure) - Không lưu LocalStorage
 let accessToken = null
 
@@ -8,23 +16,15 @@ export const setAccessToken = (token) => {
   accessToken = token
 }
 
-// Hàm lấy token (nếu cần debug)
-export const getAccessToken = () => accessToken
-
 // Hàm xóa token (khi logout)
 export const clearAccessToken = () => {
   accessToken = null
 }
 
-const api = axios.create({
-  baseURL: '/api',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  withCredentials: true // Quan trọng: Để gửi kèm Cookie (RefreshToken)
-})
+// Hàm lấy token (nếu cần debug)
+export const getAccessToken = () => accessToken
 
-// --- 1. REQUEST INTERCEPTOR (Gửi đi) ---
+// --- 1. REQUEST INTERCEPTOR (Gửi đi) - - Ensure token is always attached ---
 api.interceptors.request.use(
   (config) => {
     // Nếu có token trong RAM -> Đính kèm vào Header
@@ -40,11 +40,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const status = error.response?.status
 
     // 401: token hết hạn / chưa login
-    if (status === 401) {
+    if (error.response?.status === 401) {
       clearAccessToken()
+      // * Optional: redirect to login
+      // window.location.href = '/login'
     }
 
     return Promise.reject(error)

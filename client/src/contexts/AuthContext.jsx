@@ -69,13 +69,27 @@ export const AuthProvider = ({ children }) => {
     )
   }
 
+  // ===== RELOAD USER =====
+  const reloadUser = async () => {
+    try {
+      const userData = await authService.getCurrentUser()
+      setUser(userData.data)
+      return userData.data
+    } catch (error) {
+      clearAccessToken()
+      setUser(null)
+      throw error
+    }
+  }
+
   // ===== Public API =====
   const value = {
     user,
     loading,
     login,
     register,
-    logout
+    logout,
+    reloadUser
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

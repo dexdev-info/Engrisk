@@ -17,9 +17,6 @@ const cookieOptions = {
   expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 ngày
 }
 
-// @desc    Register user
-// @route   POST /api/auth/register
-// @access  Public
 export const register = async (req, res, next) => {
   try {
     const user = await registerUser(req.body)
@@ -39,9 +36,6 @@ export const register = async (req, res, next) => {
   }
 }
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body
@@ -72,9 +66,6 @@ export const login = async (req, res, next) => {
   }
 }
 
-// @desc    Refresh access token
-// @route   POST /api/auth/refresh-token
-// @access  Public (nhưng cần refresh token trong cookie)
 export const refreshToken = async (req, res, next) => {
   try {
     const token = req.cookies.refreshToken // Lấy từ Cookie
@@ -98,9 +89,6 @@ export const refreshToken = async (req, res, next) => {
   }
 }
 
-// @desc    Logout user
-// @route   POST /api/auth/logout
-// @access  Private (dựa trên refresh token)
 export const logout = async (req, res, next) => {
   try {
     const token = req.cookies.refreshToken

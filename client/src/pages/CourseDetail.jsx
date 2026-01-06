@@ -9,7 +9,7 @@ import {
   ArrowLeftOutlined,
   UserOutlined
 } from '@ant-design/icons'
-import courseService from '../services/courseService.js'
+import { courseService } from '../services/courseService.js'
 import { useAuth } from '../hooks/useAuth.js'
 // import { authService } from '../services/authService.js'
 // import { useRevalidator } from 'react-router-dom' // Nếu dùng data router loader (optional)
@@ -219,7 +219,7 @@ const CourseDetail = () => {
                       onClick={() => {
                         if (course.lessons && course.lessons.length > 0) {
                           message.info('Đang chuyển đến bài học đầu tiên...')
-                          // navigate(`/learn/${course.slug}/${course.lessons[0].slug}`)
+                          navigate(`/learn/${course.slug}/${course.lessons[0].slug}`)
                         }
                       }}
                     >

@@ -1,15 +1,23 @@
 import api from '../lib/api.js'
 
-const lessonService = {
-  getBySlug: async (slug) => {
-    const response = await api.get(`/lessons/${slug}`)
-    return response.data
+export const lessonService = {
+  async getBySlug({ slug }) {
+    const { data } = await api.get(`/lessons/${slug}`)
+    return data
   },
 
-  markComplete: async (lessonId) => {
-    const response = await api.post(`/lessons/${lessonId}/complete`)
-    return response.data
+  async markComplete({ lessonId }) {
+    const { data } = await api.post(`/lessons/${lessonId}/complete`)
+    return data
   },
+
+  async saveNotes({ lessonId, notes }) {
+    const { data } = await api.post(`/lessons/${lessonId}/notes`, { notes })
+    return data
+  },
+
+  async updateTimeSpent({ lessonId, timeSpent }) {
+    const { data } = await api.post(`/lessons/${lessonId}/update-time`, { timeSpent })
+    return data
+  }
 }
-
-export default lessonService

@@ -4,21 +4,24 @@ import { Suspense, lazy } from 'react'
 // import { RequireAuth } from './requireAuth.js';
 
 // Layouts
-import MainLayout from '../components/layouts/MainLayout'
-import AuthLayout from '../components/layouts/AuthLayout'
-import ErrorBoundary from '../components/common/ErrorBoundary'
-import NotFound from '../pages/NotFound'
+import MainLayout from '../components/layouts/MainLayout.jsx'
+import AuthLayout from '../components/layouts/AuthLayout.jsx'
+import ErrorBoundary from '../components/common/ErrorBoundary.jsx'
+import NotFound from '../pages/NotFound.jsx'
 
 // Lazy Pages
 const Dashboard = lazy(() => (
   <div className="p-6">Dashboard Real Content Coming Soon</div>
 ))
-import Courses from '../pages/Courses'
-import CourseDetail from '../pages/CourseDetail'
 
-// Auth Pages (Eager load login/register cho nhanh)
-import Login from '../pages/auth/Login'
-import Register from '../pages/auth/Register'
+// Auth Pages
+import Login from '../pages/auth/Login.jsx'
+import Register from '../pages/auth/Register.jsx'
+
+// Main pages
+import Courses from '../pages/Courses.jsx'
+import CourseDetail from '../pages/CourseDetail.jsx'
+import Lesson from '../pages/Lesson.jsx'
 
 // Loading Fallback
 const Loading = () => (
@@ -60,7 +63,18 @@ const router = createBrowserRouter([
       { path: 'profile', element: <div>Profile Page</div> }
     ]
   },
+  // === LESSON ROUTES (PROTECTED) ===
+  {
+    path: '/learn/:courseSlug/:lessonSlug',
+    element: (
+      <Suspense fallback={<Loading />}>
+        <Lesson />
+      </Suspense>
+    ),
+    errorElement: <ErrorBoundary />
+  },
   { path: '*', element: <NotFound /> }
+  // { path: '*', element: <ErrorBoundary /> }
 ])
 
 export default router

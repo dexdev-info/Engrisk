@@ -2,10 +2,11 @@ import { Modal, Button } from 'antd'
 import { StarOutlined } from '@ant-design/icons'
 import { useVocabularySave } from '../../hooks/useVocabularySave.js'
 
-const VocabularyModal = ({ vocab, onClose }) => {
+const VocabularyModal = ({ vocab, onClose, onSavedChange }) => {
   const { saved, loading, toggleSave } = useVocabularySave({
     vocabId: vocab._id,
-    initialSaved: vocab.isSaved
+    initialSaved: vocab.isSaved,
+    onSavedChange
   })
 
   return (

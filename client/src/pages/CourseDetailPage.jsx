@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { App, Typography, Button, Spin, Avatar, Tag, Card, Divider } from 'antd'
+import {
+  App,
+  Typography,
+  Button,
+  Spin,
+  Avatar,
+  Tag,
+  Card,
+  Divider,
+  Progress
+} from 'antd'
 import {
   PlayCircleOutlined,
   ClockCircleOutlined,
@@ -28,22 +38,28 @@ const CourseDetail = () => {
 
   // Fetch course khi component mount HOAC khi user thay doi
   useEffect(() => {
+    let mounted = true
+
     const fetchCourse = async () => {
       setLoading(true)
       try {
         const res = await courseService.getBySlug(slug)
-        setCourse(res.data)
+        if (mounted) setCourse(res.data)
       } catch (error) {
         console.error(error)
         message.error('Không thể tải thông tin khóa học')
       } finally {
-        setLoading(false)
+        if (mounted) setLoading(false)
       }
     }
 
     fetchCourse()
-  }, [slug, user]) // Thêm vào dependency để refetch khi thay đổi
+    return () => {
+      mounted = false
+    }
+  }, [slug]) // Thêm vào dependency để refetch khi thay đổi
 
+  // Enroll
   const handleEnroll = async () => {
     if (!user) {
       message.info('Vui lòng đăng nhập để tham gia khóa học')
@@ -69,14 +85,45 @@ const CourseDetail = () => {
       message.success('Đăng ký thành công! Bắt đầu học thôi.')
 
       // * Optional: Navigate to first lesson
-      // if (course.lessons && course.lessons.length > 0) {
-      //   navigate(`/learn/${course.slug}/${course.lessons[0].slug}`);
-      // }
+      const firstLesson = course.lessons?.[0]
+      if (firstLesson) {
+        navigate(`/learn/${course.slug}/${firstLesson.slug}`)
+      }
     } catch (error) {
       console.error('[ENROLL ERROR]', error)
       message.error(error.response?.data?.error || 'Đăng ký thất bại')
     } finally {
       setEnrolling(false)
+    }
+  }
+
+  // Resume
+  const handleResume = () => {
+    if (!course.isEnrolled) {
+      message.warning('Bạn cần đăng ký khóa học để học')
+      return
+    }
+
+    const enrollment = course.enrollmentData
+    if (!enrollment) return
+
+    const { lastLessonAccessed } = enrollment
+
+    // Case 1: resume lesson
+    if (lastLessonAccessed) {
+      const lesson = course.lessons.find(
+        (l) => String(l._id) === String(lastLessonAccessed)
+      )
+      if (lesson) {
+        navigate(`/learn/${course.slug}/${lesson.slug}`)
+        return
+      }
+    }
+
+    // Case 2: chưa học bài nào → lesson đầu tiên
+    const firstLesson = course.lessons?.[0]
+    if (firstLesson) {
+      navigate(`/learn/${course.slug}/${firstLesson.slug}`)
     }
   }
 
@@ -90,7 +137,7 @@ const CourseDetail = () => {
     return <div className="text-center mt-20">Khóa học không tồn tại</div>
 
   // * Check user enrollment locally ưu tiên course.isEnrolled từ API
-  const isEnrolled = course.isEnrolled === true
+  const isEnrolled = Boolean(course?.isEnrolled)
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-8">
@@ -140,11 +187,12 @@ const CourseDetail = () => {
                     : 'opacity-70 cursor-not-allowed'
                 }`}
                 onClick={() => {
-                  if (isEnrolled) {
-                    message.info(`Đi tới bài học: ${lesson.title}`)
-                  } else {
+                  if (!isEnrolled) {
                     message.warning('Bạn cần đăng ký khóa học để xem bài này')
+                    return
                   }
+
+                  navigate(`/learn/${course.slug}/${lesson.slug}`)
                 }}
               >
                 <div className="flex items-center gap-4">
@@ -171,7 +219,15 @@ const CourseDetail = () => {
                 </div>
 
                 {isEnrolled && (
-                  <Button size="small" type="primary" ghost>
+                  <Button
+                    size="small"
+                    type="primary"
+                    ghost
+                    onClick={(e) => {
+                      e.stopPropagation() // 🚫 tránh trigger onClick của List.Item
+                      navigate(`/learn/${course.slug}/${lesson.slug}`)
+                    }}
+                  >
                     Học ngay
                   </Button>
                 )}
@@ -211,17 +267,27 @@ const CourseDetail = () => {
                     <Tag color="success" className="mb-3">
                       ✓ Đã đăng ký
                     </Tag>
+
+                    {/* ✅ Progress học tập */}
+                    {course.enrollmentData && (
+                      <div className="mb-4 text-left">
+                        <div className="text-sm text-gray-600 mb-1">
+                          Tiến độ khóa học
+                        </div>
+                        <Progress
+                          percent={course.enrollmentData.progressPercentage}
+                          strokeColor="#1677ff"
+                          size="small"
+                        />
+                      </div>
+                    )}
+
                     <Button
                       type="primary"
                       size="large"
                       block
                       className="h-12 text-lg font-bold bg-green-600 hover:bg-green-500 border-none"
-                      onClick={() => {
-                        if (course.lessons && course.lessons.length > 0) {
-                          message.info('Đang chuyển đến bài học đầu tiên...')
-                          navigate(`/learn/${course.slug}/${course.lessons[0].slug}`)
-                        }
-                      }}
+                      onClick={handleResume}
                     >
                       TIẾP TỤC HỌC
                     </Button>

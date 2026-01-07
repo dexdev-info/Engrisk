@@ -8,6 +8,10 @@ export const useLesson = (lessonSlug) => {
 
   // Fetch lesson
   useEffect(() => {
+    // let isBootstrapped = false
+    // if (isBootstrapped) return
+    // isBootstrapped = true
+
     let mounted = true
 
     const fetchLesson = async () => {
@@ -25,7 +29,7 @@ export const useLesson = (lessonSlug) => {
       }
     }
     fetchLesson()
-    
+
     return () => {
       mounted = false
     }
@@ -34,7 +38,7 @@ export const useLesson = (lessonSlug) => {
   // start time tracking
   useEffect(() => {
     startTimeRef.current = Date.now()
-  }, [])
+  }, [lessonSlug])
 
   // send time on unmount
   useEffect(() => {

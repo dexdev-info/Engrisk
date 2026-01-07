@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { message } from 'antd'
 import { vocabularyService } from '../services/vocabularyService.js'
 
-export const useVocabularySave = ({ vocabId, initialSaved }) => {
+export const useVocabularySave = ({ vocabId, initialSaved, onSavedChange }) => {
   const [saved, setSaved] = useState(initialSaved)
   const [loading, setLoading] = useState(false)
 
@@ -20,6 +20,7 @@ export const useVocabularySave = ({ vocabId, initialSaved }) => {
     try {
       await vocabularyService.toggleSave({ vocabId })
       setSaved(nextSaved)
+      onSavedChange?.(nextSaved)
 
       message.success(nextSaved ? 'Đã lưu vào từ của bạn' : 'Đã bỏ lưu từ vựng')
     } catch {
@@ -27,7 +28,7 @@ export const useVocabularySave = ({ vocabId, initialSaved }) => {
     } finally {
       setLoading(false)
     }
-  }, [saved, loading, vocabId])
+  }, [saved, loading, vocabId, onSavedChange])
 
   return {
     saved,

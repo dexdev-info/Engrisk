@@ -1,7 +1,13 @@
 import { Button } from 'antd'
 import { lessonService } from '../../services/lessonService.js'
 
-const LessonFooter = ({ lessonId, navigation, isCompleted, onCompleted }) => {
+const LessonFooter = ({
+  lessonId,
+  navigation,
+  courseSlug,
+  isCompleted,
+  onCompleted
+}) => {
   const handleComplete = async () => {
     if (!lessonId) return
 
@@ -10,9 +16,9 @@ const LessonFooter = ({ lessonId, navigation, isCompleted, onCompleted }) => {
 
       onCompleted({
         isCompleted: true,
+        courseProgress: res.data.courseProgress,
         nextLesson: res.data.nextLesson
       })
-      // onCompleted(res.data.navigation)
     } catch (e) {
       console.error(e)
     }
@@ -21,9 +27,7 @@ const LessonFooter = ({ lessonId, navigation, isCompleted, onCompleted }) => {
   return (
     <footer className="flex justify-between pt-6 border-t">
       {navigation.previous && (
-        <Button
-          href={`/learn/${navigation.previous.courseSlug}/${navigation.previous.slug}`}
-        >
+        <Button href={`/learn/${courseSlug}/${navigation.previous.slug}`}>
           ← Bài trước
         </Button>
       )}
@@ -37,7 +41,7 @@ const LessonFooter = ({ lessonId, navigation, isCompleted, onCompleted }) => {
       {isCompleted && navigation.next && (
         <Button
           type="primary"
-          href={`/learn/${navigation.next.courseSlug}/${navigation.next.slug}`}
+          href={`/learn/${courseSlug}/${navigation.next.slug}`}
         >
           Bài tiếp theo →
         </Button>

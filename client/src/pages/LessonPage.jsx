@@ -10,7 +10,7 @@ import LessonNotes from '../components/lesson/LessonNotes.jsx'
 import LessonFooter from '../components/lesson/LessonFooter.jsx'
 
 const LessonPage = () => {
-  const { lessonSlug } = useParams()
+  const { courseSlug, lessonSlug } = useParams()
   const { data, loading, setData } = useLesson(lessonSlug)
 
   if (loading) return <Spin fullscreen />
@@ -18,19 +18,23 @@ const LessonPage = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-4 space-y-10">
-      <LessonHeader lesson={data.lesson} progress={data.userProgress} />
+      <LessonHeader
+        lesson={data.lesson}
+        progress={data.userProgress}
+        navigation={data.navigation}
+      />
 
       <LessonContent lesson={data.lesson} />
 
       <LessonVocabulary
-        key={data.lesson._id}
+        // key={`vocab-${data.lesson._id}`}
         vocabularies={data.lesson.vocabularies}
       />
 
       <LessonExercises exercises={data.exercises} />
 
       <LessonNotes
-        key={data.lesson._id}
+        // key={`notes-${data.lesson._id}`}
         lessonId={data.lesson._id}
         initialNotes={data.userProgress?.notes}
       />
@@ -38,14 +42,20 @@ const LessonPage = () => {
       <LessonFooter
         lessonId={data.lesson._id}
         navigation={data.navigation}
+        courseSlug={courseSlug}
         isCompleted={data.userProgress?.isCompleted}
-        onCompleted={() =>
+        onCompleted={({ courseProgress }) =>
           setData((prev) => ({
             ...prev,
             userProgress: {
               ...prev.userProgress,
               isCompleted: true
-            }
+            },
+            navigation: {
+              ...prev.navigation
+              // optional: giữ nguyên position
+            },
+            courseProgress
           }))
         }
       />

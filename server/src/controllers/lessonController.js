@@ -1,16 +1,19 @@
 import Lesson from '../models/Lesson.js'
-import Course from '../models/Course.js'
+import Exercise from '../models/Exercise.js'
 import UserProgress from '../models/UserProgress.js'
 import CourseEnrollment from '../models/CourseEnrollment.js'
+import UserVocabulary from '../models/UserVocabulary.js'
 import ErrorResponse from '../utils/errorResponse.js'
 
-// @desc    Get lesson detail by Slug
-// @route   GET /api/lessons/:slug
+/**
+ * @desc    Get lesson detail by slug (require enrollment)
+ * @route   GET /api/lessons/:slug
+ * @access  Private
+ */
 export const getLesson = async (req, res, next) => {
   try {
     const { slug } = req.params
-
-    console.log('[GET LESSON]', { slug, userId: req.user?._id })
+    const userId = req.user._id
 
     // 1. Find lesson
     const lesson = await Lesson.findOne({
@@ -34,56 +37,71 @@ export const getLesson = async (req, res, next) => {
     }
 
     // 2. Check enrollment (MUST be enrolled to view lesson)
-    if (req.user) {
-      const enrollment = await CourseEnrollment.findOne({
-        user: req.user._id,
-        course: lesson.course._id
-      })
+    const enrollment = await CourseEnrollment.findOne({
+      user: userId,
+      course: lesson.course._id
+    })
 
-      if (!enrollment) {
-        return next(
-          new ErrorResponse('Bạn cần đăng ký khóa học để xem bài học này', 403)
-        )
-      }
-
-      // Update last accessed
-      enrollment.lastLessonAccessed = lesson._id
-      enrollment.lastAccessedAt = new Date()
-      await enrollment.save()
+    if (!enrollment) {
+      return next(
+        new ErrorResponse('Bạn cần đăng ký khóa học để xem bài học này', 403)
+      )
     }
+
+    // Update resume info
+    enrollment.lastLessonAccessed = lesson._id
+    enrollment.lastAccessedAt = new Date()
+    await enrollment.save()
 
     // 3. Get user progress
-    let userProgress = null
-    if (req.user) {
-      userProgress = await UserProgress.findOne({
-        user: req.user._id,
+    let userProgress = await UserProgress.findOne({
+      user: userId,
+      lesson: lesson._id
+    })
+
+    // Create progress if not exists (track access)
+    if (!userProgress) {
+      userProgress = await UserProgress.create({
+        user: userId,
+        course: lesson.course._id,
         lesson: lesson._id
       })
-
-      // Create progress if not exists (track access)
-      if (!userProgress) {
-        userProgress = await UserProgress.create({
-          user: req.user._id,
-          course: lesson.course._id,
-          lesson: lesson._id
-        })
-      } else {
-        // Update access tracking
-        await userProgress.recordAccess()
-      }
+    } else {
+      // Update access tracking
+      await userProgress.recordAccess()
     }
 
-    // 4. Get navigation (previous/next lessons)
+    // 4. Vocabulary saved state
+    const savedVocabs = await UserVocabulary.find({
+      user: userId,
+      vocabulary: { $in: lesson.vocabularies.map((v) => v._id) }
+    }).select('vocabulary')
+
+    const savedVocabSet = new Set(
+      savedVocabs.map((v) => v.vocabulary.toString())
+    )
+
+    const vocabularies = lesson.vocabularies.map((v) => ({
+      _id: v._id,
+      word: v.word,
+      meaning: v.meaning,
+      pronunciation: v.pronunciation,
+      example: v.example,
+      exampleTranslation: v.exampleTranslation,
+      partOfSpeech: v.partOfSpeech,
+      level: v.level,
+      imageUrl: v.imageUrl,
+      audioUrl: v.audioUrl,
+      isSaved: savedVocabSet.has(v._id.toString())
+    }))
+
+    // 5. Get navigation (previous/next lessons)
     const allLessons = await Lesson.find({
       course: lesson.course._id,
       isPublished: true,
       isDeleted: false
     })
-      .select('_id title slug orderIndex course')
-      .populate({
-        path: 'course',
-        select: 'slug'
-      })
+      .select('_id slug orderIndex')
       .sort({ orderIndex: 1 })
 
     const currentIndex = allLessons.findIndex(
@@ -95,17 +113,15 @@ export const getLesson = async (req, res, next) => {
     const nextLesson =
       currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null
 
-    // 5. Get exercises (without answers for security)
-    const exercises = await lesson
-      .model('Exercise')
-      .find({
-        lesson: lesson._id,
-        isDeleted: { $ne: true }
-      })
+    // 6. Get exercises (without answers for security)
+    const exercises = await Exercise.find({
+      lesson: lesson._id,
+      isDeleted: { $ne: true }
+    })
       .select('-correctAnswer -alternativeAnswers') // Don't send answers to frontend
       .sort({ orderIndex: 1 })
 
-    // 6. Response
+    // 7. Response
     res.status(200).json({
       success: true,
       data: {
@@ -120,19 +136,19 @@ export const getLesson = async (req, res, next) => {
           type: lesson.type,
           orderIndex: lesson.orderIndex,
           course: lesson.course,
-          vocabularies: lesson.vocabularies,
+          vocabularies,
           createdAt: lesson.createdAt
         },
-        userProgress: userProgress
-          ? {
-              isCompleted: userProgress.isCompleted,
-              completedAt: userProgress.completedAt,
-              timeSpent: userProgress.timeSpent,
-              notes: userProgress.notes,
-              accessCount: userProgress.accessCount,
-              lastAccessedAt: userProgress.lastAccessedAt
-            }
-          : null,
+
+        userProgress: {
+          isCompleted: userProgress.isCompleted,
+          completedAt: userProgress.completedAt,
+          timeSpent: userProgress.timeSpent,
+          notes: userProgress.notes,
+          accessCount: userProgress.accessCount,
+          lastAccessedAt: userProgress.lastAccessedAt
+        },
+
         exercises: exercises.map((ex) => ({
           _id: ex._id,
           title: ex.title,
@@ -144,21 +160,10 @@ export const getLesson = async (req, res, next) => {
           difficulty: ex.difficulty,
           explanation: ex.explanation // Show explanation after submit
         })),
+
         navigation: {
-          previous: previousLesson
-            ? {
-                _id: previousLesson._id,
-                slug: previousLesson.slug,
-                courseSlug: previousLesson.course.slug
-              }
-            : null,
-          next: nextLesson
-            ? {
-                _id: nextLesson._id,
-                slug: nextLesson.slug,
-                courseSlug: nextLesson.course.slug
-              }
-            : null,
+          previous: previousLesson ? { slug: previousLesson.slug } : null,
+          next: nextLesson ? { slug: nextLesson.slug } : null,
           totalLessons: allLessons.length,
           currentPosition: currentIndex + 1
         }
@@ -170,21 +175,15 @@ export const getLesson = async (req, res, next) => {
   }
 }
 
-// @desc    Mark lesson as completed
-// @route   POST /api/lessons/:id/complete
+/**
+ * @desc    Complete lesson
+ * @route   POST /api/lessons/:id/complete
+ */
 export const completeLesson = async (req, res, next) => {
   try {
-    console.log('[COMPLETE LESSON] req.user:', req.user)
-    console.log('[COMPLETE LESSON] body:', req.body)
     const lessonId = req.params.id
     const userId = req.user._id
-
-    const timeSpent = req.body?.timeSpent
-    const notes = req.body?.notes
-
-    // const { timeSpent, notes } = req.body || {}
-
-    console.log('[COMPLETE LESSON]', { lessonId, userId, timeSpent })
+    const { timeSpent, notes } = req.body || {}
 
     // 1. Validate lesson exists
     const lesson = await Lesson.findById(lessonId)
@@ -219,12 +218,8 @@ export const completeLesson = async (req, res, next) => {
     }
 
     // 4. Update progress
-    if (timeSpent) {
-      progress.timeSpent += timeSpent
-    }
-    if (notes) {
-      progress.notes = notes
-    }
+    if (timeSpent) progress.timeSpent += timeSpent
+    if (notes !== undefined) progress.notes = notes
 
     // Mark as completed
     // ! markCompleted is idempotent (safe to call multiple times)
@@ -233,22 +228,12 @@ export const completeLesson = async (req, res, next) => {
     // 5. Update course enrollment progress
     await enrollment.calculateProgress()
 
-    // 6. Check for achievements (optional - implement later)
+    // TODO: 6. Check for achievements (optional - implement later)
     // await checkAndUnlockAchievements(userId)
 
-    // 7. Get next lesson suggestion
-    const nextLesson = await Lesson.findOne({
-      course: lesson.course,
-      orderIndex: { $gt: lesson.orderIndex },
-      isPublished: true,
-      isDeleted: false
-    })
-      .select('_id title slug')
-      .sort({ orderIndex: 1 })
-
+    // 7. Response
     res.status(200).json({
       success: true,
-      message: 'Chúc mừng! Bạn đã hoàn thành bài học.',
       data: {
         progress: {
           isCompleted: progress.isCompleted,
@@ -259,105 +244,86 @@ export const completeLesson = async (req, res, next) => {
         courseProgress: {
           progressPercentage: enrollment.progressPercentage,
           isCompleted: enrollment.isCompleted
-        },
-        nextLesson: nextLesson
-          ? {
-              _id: nextLesson._id,
-              title: nextLesson.title,
-              slug: nextLesson.slug
-            }
-          : null
+        }
       }
     })
   } catch (error) {
-    console.error('[COMPLETE LESSON ERROR FULL]', error)
+    console.error('[COMPLETE LESSON ERROR]', error)
     next(error)
   }
 }
 
-// @desc    Update time spent on lesson
-// @route   POST /api/lessons/:id/update-time
-// @access  Private
+/**
+ * @desc    Update time spent
+ * @route   POST /api/lessons/:id/update-time
+ */
 export const updateTimeSpent = async (req, res, next) => {
   try {
     const lessonId = req.params.id
     const userId = req.user._id
-    // const { timeSpent } = req.body // seconds
-    const timeSpent = req.body?.timeSpent // seconds
+    const { timeSpent } = req.body // seconds
 
     if (!timeSpent || timeSpent < 0) {
       return next(new ErrorResponse('Invalid time value', 400))
     }
 
     // Find or create progress
-    let progress = await UserProgress.findOne({
-      user: userId,
-      lesson: lessonId
-    })
+    const progress = await UserProgress.findOneAndUpdate(
+      {
+        user: userId,
+        lesson: lessonId
+      },
+      {
+        $inc: { timeSpent },
+        lastAccessedAt: new Date()
+      },
+      { new: true }
+    )
 
     if (!progress) {
-      const lesson = await Lesson.findById(lessonId)
-      if (!lesson) {
-        return next(new ErrorResponse('Lesson not found', 404))
-      }
-
-      progress = new UserProgress({
-        user: userId,
-        course: lesson.course,
-        lesson: lessonId,
-        timeSpent: 0
-      })
+      return next(new ErrorResponse('Progress not found', 404))
     }
-
-    // Update time
-    progress.timeSpent += timeSpent
-    progress.lastAccessedAt = new Date()
-    await progress.save()
 
     res.status(200).json({
       success: true,
-      data: {
-        totalTimeSpent: progress.timeSpent
-      }
+      data: { totalTimeSpent: progress.timeSpent }
     })
   } catch (error) {
     next(error)
   }
 }
 
-// @desc    Save/Update lesson notes
-// @route   POST /api/lessons/:id/notes
-// @access  Private
+/**
+ * @desc    Save lesson notes
+ * @route   POST /api/lessons/:id/notes
+ */
 export const saveNotes = async (req, res, next) => {
   try {
-    const lessonId = req.params.id
     const userId = req.user._id
-    const { notes } = req.body
+    const lessonId = req.params.id
+    const { notes = '' } = req.body
 
-    if (notes && notes.length > 5000) {
+    if (notes.length > 5000) {
       return next(new ErrorResponse('Notes cannot exceed 5000 characters', 400))
     }
 
     // Find progress
-    const progress = await UserProgress.findOne({
-      user: userId,
-      lesson: lessonId
-    })
+    const progress = await UserProgress.findOneAndUpdate(
+      {
+        user: userId,
+        lesson: lessonId
+      },
+      { notes },
+      { new: true }
+    )
 
     if (!progress) {
-      return next(new ErrorResponse('Please access the lesson first', 404))
+      return next(new ErrorResponse('Progress not found', 404))
     }
-
-    // Update notes
-    progress.notes = notes || ''
-    await progress.save()
 
     res.status(200).json({
       success: true,
-      message: 'Ghi chú đã được lưu',
-      data: {
-        notes: progress.notes
-      }
+      data: { notes: progress.notes }
     })
   } catch (error) {
     next(error)

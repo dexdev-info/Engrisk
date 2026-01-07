@@ -7,7 +7,7 @@ import { Suspense, lazy } from 'react'
 import MainLayout from '../components/layouts/MainLayout.jsx'
 import AuthLayout from '../components/layouts/AuthLayout.jsx'
 import ErrorBoundary from '../components/common/ErrorBoundary.jsx'
-import NotFound from '../pages/NotFound.jsx'
+import NotFound from '../pages/NotFoundPage.jsx'
 
 // Lazy Pages
 const Dashboard = lazy(() => (
@@ -15,13 +15,13 @@ const Dashboard = lazy(() => (
 ))
 
 // Auth Pages
-import Login from '../pages/auth/Login.jsx'
-import Register from '../pages/auth/Register.jsx'
+import Login from '../pages/auth/LoginPage.jsx'
+import Register from '../pages/auth/RegisterPage.jsx'
 
 // Main pages
-import Courses from '../pages/Courses.jsx'
-import CourseDetail from '../pages/CourseDetail.jsx'
-import Lesson from '../pages/Lesson.jsx'
+import Courses from '../pages/CoursesPage.jsx'
+import CourseDetail from '../pages/CourseDetailPage.jsx'
+import Lesson from '../pages/LessonPage.jsx'
 
 // Loading Fallback
 const Loading = () => (

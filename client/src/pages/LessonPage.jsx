@@ -27,14 +27,12 @@ const LessonPage = () => {
       <LessonContent lesson={data.lesson} />
 
       <LessonVocabulary
-        // key={`vocab-${data.lesson._id}`}
         vocabularies={data.lesson.vocabularies}
       />
 
       <LessonExercises exercises={data.exercises} />
 
       <LessonNotes
-        // key={`notes-${data.lesson._id}`}
         lessonId={data.lesson._id}
         initialNotes={data.userProgress?.notes}
       />

@@ -8,8 +8,7 @@ import { Spin } from 'antd'
 export const AuthProvider = ({ children }) => {
   // children là toàn bộ App bên trong <AuthProvider>
   const [user, setUser] = useState(null) // Lưu info user
-  const [loading, setLoading] = useState(true) // Trạng thái load lần đầu
-
+  const [loading, setLoading] = useState(true)
   // Check login ngay khi F5 trang
   useEffect(() => {
     let isBootstrapped = false

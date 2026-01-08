@@ -9,7 +9,7 @@ export const getCourses = async (req, res, next) => {
       isDeleted: false
     })
       .select(
-        'title slug thumbnail level description lessonsCount enrolledCount'
+        'title slug thumbnail level description lessonsCount enrolledCount estimatedDuration'
       ) // Chỉ lấy field cần thiết
       .sort({ orderIndex: 1 })
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import VocabularyModal from './VocabularyModal.jsx'
+import VocabularyModal from '../vocabulary/VocabularyModal.jsx'
 
 const LessonVocabulary = ({ vocabularies }) => {
   const [vocabs, setVocabs] = useState(vocabularies)

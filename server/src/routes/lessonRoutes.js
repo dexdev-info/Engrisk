@@ -6,9 +6,9 @@ const router = express.Router()
 
 router.use(protect)
 
-router.get('/:slug', getLesson)
 router.post('/:id/complete', completeLesson)
 router.post('/:id/update-time', updateTimeSpent)
 router.post('/:id/notes', saveNotes)
+router.get('/:slug', getLesson)
 
 export default router

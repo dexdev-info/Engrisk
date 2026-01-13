@@ -101,14 +101,13 @@ userSchema.virtual('achievements', {
 })
 
 /* =======================
-    GLOBAL QUERY FILTER
+    QUERY FILTER
 ======================= */
-function autoExcludeDeleted() {
+const autoExcludeDeleted = function () {
   this.where({ isDeleted: false })
 }
 
-userSchema.pre('find', autoExcludeDeleted)
-userSchema.pre('findOne', autoExcludeDeleted)
+userSchema.pre(/^find/, autoExcludeDeleted)
 userSchema.pre('countDocuments', autoExcludeDeleted)
 
 /* =======================

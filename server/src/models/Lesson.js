@@ -89,12 +89,11 @@ lessonSchema.virtual('exercises', {
 /* =======================
     QUERY FILTER
 ======================= */
-function autoExcludeDeleted() {
+const autoExcludeDeleted = function () {
   this.where({ isDeleted: false })
 }
 
-lessonSchema.pre('find', autoExcludeDeleted)
-lessonSchema.pre('findOne', autoExcludeDeleted)
+lessonSchema.pre(/^find/, autoExcludeDeleted)
 lessonSchema.pre('countDocuments', autoExcludeDeleted)
 
 /* =======================

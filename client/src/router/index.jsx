@@ -22,6 +22,7 @@ import Register from '../pages/auth/RegisterPage.jsx'
 import Courses from '../pages/CoursesPage.jsx'
 import CourseDetail from '../pages/CourseDetailPage.jsx'
 import Lesson from '../pages/LessonPage.jsx'
+import Vocabulary from '../pages/VocabularyPage.jsx'
 
 // Loading Fallback
 const Loading = () => (
@@ -59,7 +60,7 @@ const router = createBrowserRouter([
       { path: 'courses', element: <Courses /> },
       { path: 'courses/:slug', element: <CourseDetail /> }, // Dynamic route
 
-      { path: 'vocabulary', element: <div>Vocabulary Page</div> },
+      { path: 'vocabulary', element: <Vocabulary /> },
       { path: 'profile', element: <div>Profile Page</div> }
     ]
   },

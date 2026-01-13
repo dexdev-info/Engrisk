@@ -8,10 +8,6 @@ export const useLesson = (lessonSlug) => {
 
   // Fetch lesson
   useEffect(() => {
-    // let isBootstrapped = false
-    // if (isBootstrapped) return
-    // isBootstrapped = true
-
     let mounted = true
 
     const fetchLesson = async () => {
@@ -28,11 +24,9 @@ export const useLesson = (lessonSlug) => {
         if (mounted) setLoading(false)
       }
     }
-    fetchLesson()
 
-    return () => {
-      mounted = false
-    }
+    fetchLesson()
+    return () => (mounted = false)
   }, [lessonSlug])
 
   // start time tracking

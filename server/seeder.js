@@ -75,7 +75,7 @@ const importData = async () => {
       title: 'English for Beginners',
       description:
         'Khóa học nền tảng dành cho người mất gốc. Tập trung vào từ vựng và ngữ pháp cơ bản.',
-      level: 'Beginner',
+      level: 'beginner',
       thumbnail:
         'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&q=80&w=800',
       createdBy: adminUser,

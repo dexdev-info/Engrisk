@@ -21,6 +21,10 @@ const CourseDetail = () => {
     selectLesson
   } = useCourseDetail({ slug, navigate, message })
 
+  const handleRequireEnroll = () => {
+    message.warning('Bạn cần đăng ký khóa học để xem bài này')
+  }
+
   if (loading) return <Spin fullscreen />
   if (!course)
     return <div className="text-center mt-20">Khóa học không tồn tại</div>
@@ -36,9 +40,7 @@ const CourseDetail = () => {
             course={course}
             isEnrolled={isEnrolled}
             onSelectLesson={selectLesson}
-            onRequireEnroll={() =>
-              message.warning('Bạn cần đăng ký khóa học để xem bài này')
-            }
+            onRequireEnroll={handleRequireEnroll}
           />
         </div>
 

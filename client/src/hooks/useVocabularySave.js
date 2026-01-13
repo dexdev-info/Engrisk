@@ -18,7 +18,7 @@ export const useVocabularySave = ({ vocabId, initialSaved, onSavedChange }) => {
     setLoading(true)
 
     try {
-      await vocabularyService.toggleSave({ vocabId })
+      await vocabularyService.toggleSave(vocabId)
       setSaved(nextSaved)
       onSavedChange?.(nextSaved)
 

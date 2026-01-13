@@ -6,7 +6,6 @@ import {
   refreshToken,
   logout
 } from '../controllers/authController.js'
-import { protect } from '../middleware/auth.middleware.js'
 // const { validateRegister, validateLogin } = require('../validators/authValidator');
 
 router.post('/register', register)

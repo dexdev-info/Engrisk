@@ -17,8 +17,7 @@ export const useCourseDetail = ({ slug, navigate, message }) => {
       try {
         const res = await courseService.getBySlug({ slug })
         if (mounted) setCourse(res.data)
-      } catch (error) {
-        console.error('[FETCH COURSE ERROR]', error)
+      } catch {
         message?.error('Không thể tải thông tin khóa học')
       } finally {
         if (mounted) setLoading(false)

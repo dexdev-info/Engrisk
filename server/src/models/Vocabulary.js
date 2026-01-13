@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import slugify from 'slugify'
 
 const vocabularySchema = new Schema(
   {
@@ -9,6 +10,13 @@ const vocabularySchema = new Schema(
       trim: true,
       lowercase: true,
       maxlength: [100, 'Word cannot exceed 100 characters']
+    },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true
     },
     // Phonetic pronunciation (IPA)
     pronunciation: {
@@ -55,10 +63,10 @@ const vocabularySchema = new Schema(
     level: {
       type: String,
       enum: {
-        values: ['Beginner', 'Intermediate', 'Advanced'],
+        values: ['beginner', 'intermediate', 'advanced'],
         message: 'Level must be beginner, intermediate, or advanced'
       },
-      default: 'Beginner'
+      default: 'beginner'
     },
     // Image URL for visual learning
     imageUrl: {
@@ -95,6 +103,16 @@ const vocabularySchema = new Schema(
     usageCount: {
       type: Number,
       default: 0
+    },
+    // ===== Soft Delete =====
+    isDeleted: {
+      type: Boolean,
+      default: false,
+      index: true
+    },
+    deletedAt: {
+      type: Date,
+      default: null
     }
   },
   {
@@ -102,8 +120,66 @@ const vocabularySchema = new Schema(
   }
 )
 
+/* =======================
+    QUERY FILTER
+======================= */
+// const autoExcludeDeleted = function () {
+//   this.where({ isDeleted: false })
+// }
+
+// vocabularySchema.pre(/^find/, autoExcludeDeleted)
+// vocabularySchema.pre('countDocuments', autoExcludeDeleted)
+
+/* =======================
+    SLUG UNIQUE
+======================= */
+vocabularySchema.pre('validate', async function () {
+  if (!this.isModified('word')) return
+
+  const baseSlug = slugify(this.word, {
+    lower: true,
+    strict: true,
+    remove: /[*+~.()'"!:@]/g
+  })
+
+  let slug = baseSlug
+  let counter = 1
+
+  while (await this.constructor.exists({ slug, _id: { $ne: this._id } })) {
+    slug = `${baseSlug}-${counter++}`
+  }
+
+  this.slug = slug
+})
+
+/* =======================
+    SOFT DELETE (CASCADE)
+======================= */
+vocabularySchema.methods.softDelete = async function () {
+  this.isDeleted = true
+  this.deletedAt = new Date()
+  await this.save()
+}
+
+// Related Words
+vocabularySchema.path('relatedWords').validate(function (value) {
+  return !value.includes(this._id)
+}, 'Related words cannot include itself')
+
+// Usage Count
+vocabularySchema.statics.incrementUsage = function (id) {
+  return this.updateOne({ _id: id }, { $inc: { usageCount: 1 } })
+}
+// * use: await Vocabulary.incrementUsage(vocabId)
+
 // Indexes
 vocabularySchema.index({ word: 1 })
+// *
+vocabularySchema.index({
+  word: 'text',
+  meaning: 'text',
+  example: 'text'
+})
 vocabularySchema.index({ level: 1 })
 vocabularySchema.index({ partOfSpeech: 1 })
 vocabularySchema.index({ usageCount: -1 })

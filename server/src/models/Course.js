@@ -26,10 +26,10 @@ const courseSchema = Schema(
     level: {
       type: String,
       enum: {
-        values: ['Beginner', 'Intermediate', 'Advanced'],
+        values: ['beginner', 'intermediate', 'advanced'],
         message: 'Level must be beginner, intermediate, or advanced'
       },
-      default: 'Beginner'
+      default: 'beginner'
     },
     isPublished: {
       type: Boolean,
@@ -88,12 +88,11 @@ courseSchema.virtual('lessons', {
 /* =======================
     QUERY FILTER
 ======================= */
-function autoExcludeDeleted() {
+const autoExcludeDeleted = function () {
   this.where({ isDeleted: false })
 }
 
-courseSchema.pre('find', autoExcludeDeleted)
-courseSchema.pre('findOne', autoExcludeDeleted)
+courseSchema.pre(/^find/, autoExcludeDeleted)
 courseSchema.pre('countDocuments', autoExcludeDeleted)
 
 /* =======================

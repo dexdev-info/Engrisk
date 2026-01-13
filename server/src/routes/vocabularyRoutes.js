@@ -1,17 +1,33 @@
 import express from 'express'
 const router = express.Router()
+
 import {
   getVocabularies,
+  getVocabularyById,
+  getVocabularyBySlug,
   toggleSaveVocab,
   getMyVocabularies,
-  reviewVocab
+  reviewVocab,
+  updateVocabNotes,
+  getReviewQueue
 } from '../controllers/vocabularyController.js'
-import { protect } from '../middleware/auth.middleware.js'
 
-router.get('/', getVocabularies) // Public Dictionary
-router.get('/my-vocab', protect, getMyVocabularies) // SRS List
+import { protect, optionalAuth } from '../middleware/auth.middleware.js'
 
-router.post('/:id/save', protect, toggleSaveVocab) // Save/Unsave
-router.post('/review/:id', protect, reviewVocab) // Submit review result
+// ===== PUBLIC =====
+router.get('/', optionalAuth, getVocabularies)
+
+// ===== PERSONAL / SRS =====
+router.get('/my', protect, getMyVocabularies)
+router.get('/review-queue', protect, getReviewQueue)
+
+// ===== ACTIONS =====
+router.post('/:id/save', protect, toggleSaveVocab)
+router.post('/:id/notes', protect, updateVocabNotes)
+router.post('/review/:id', protect, reviewVocab)
+
+// ===== DETAIL =====
+router.get('/:id', optionalAuth, getVocabularyById)
+router.get('/:slug', optionalAuth, getVocabularyBySlug)
 
 export default router

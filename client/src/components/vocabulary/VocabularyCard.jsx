@@ -92,7 +92,7 @@ const VocabularyCard = ({ vocab, onOpen, onSavedChange }) => {
       {/* ===== Meta ===== */}
       <div className="mt-4 flex gap-2 flex-wrap">
         {partOfSpeech && <Tag>{partOfSpeech}</Tag>}
-        {/* {level && <Tag color="blue">{level}</Tag>} */}
+        {/* {level && <Tag color="green">{level}</Tag>} */}
       </div>
     </div>
   )

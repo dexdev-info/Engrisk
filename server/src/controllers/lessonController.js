@@ -24,7 +24,7 @@ export const getLesson = async (req, res, next) => {
       .populate({
         path: 'vocabularies',
         select:
-          'word meaning pronunciation example exampleTranslation partOfSpeech level imageUrl audioUrl',
+          'word meaning pronunciation example exampleTranslation partOfSpeech level imageUrl audioUrl synonyms antonyms relatedWords',
         match: { isDeleted: { $ne: true } }
       })
       // Lấy thêm info course để breadcrumb
@@ -92,6 +92,9 @@ export const getLesson = async (req, res, next) => {
       level: v.level,
       imageUrl: v.imageUrl,
       audioUrl: v.audioUrl,
+      synonyms: v.synonyms,
+      antonyms: v.antonyms,
+      relatedWords: v.relatedWords,
       isSaved: savedVocabSet.has(v._id.toString())
     }))
 

@@ -19,19 +19,21 @@ const AppHeader = ({ collapsed, setCollapsed }) => {
     token: { colorBgContainer }
   } = theme.useToken()
   const navigate = useNavigate()
-
-  // 2. Lấy user và hàm logout từ Context
   const { user, logout } = useAuth()
 
-  // Xử lý đăng xuất với hộp thoại xác nhận
+  // --- LOGOUT LOGIC ---
   const handleLogout = () => {
     confirm({
-      title: 'Bạn có chắc chắn muốn đăng xuất?',
-      icon: <ExclamationCircleFilled />,
-      content: 'Phiên làm việc của bạn sẽ kết thúc.',
+      title: 'Đăng xuất?',
+      icon: <ExclamationCircleFilled style={{ color: '#ef4444' }} />, // Red-500
+      content: 'Bạn có chắc chắn muốn kết thúc phiên làm việc không?',
       okText: 'Đăng xuất',
       okType: 'danger',
-      cancelText: 'Hủy',
+      cancelText: 'Ở lại',
+      // Style cho Modal nút bấm gọn gàng
+      okButtonProps: { size: 'middle' },
+      cancelButtonProps: { type: 'text' },
+      centered: true,
       onOk: async () => {
         try {
           await logout()
@@ -39,13 +41,13 @@ const AppHeader = ({ collapsed, setCollapsed }) => {
           navigate('/login')
         } catch (error) {
           console.error('Logout failed:', error)
-          // Vẫn chuyển về login kể cả khi API lỗi để tránh kẹt user
           navigate('/login')
         }
       }
     })
   }
 
+  // --- MENU ITEMS ---
   const userMenuResult = [
     {
       key: 'profile',
@@ -57,32 +59,28 @@ const AppHeader = ({ collapsed, setCollapsed }) => {
       key: 'settings',
       label: 'Cài đặt',
       icon: <SettingOutlined />,
-      onClick: () => navigate('/settings') // Cần tạo trang này sau
+      onClick: () => navigate('/settings')
     },
-    {
-      type: 'divider'
-    },
+    { type: 'divider' },
     {
       key: 'logout',
       label: 'Đăng xuất',
       icon: <LogoutOutlined />,
       danger: true,
-      onClick: handleLogout // Gọi hàm xử lý logout
+      onClick: handleLogout
     }
   ]
 
   return (
     <Header
+      // STYLE:
+      // 1. !bg-white: Nền trắng tuyệt đối
+      // 2. border-b border-gray-100: Viền mảnh thay vì shadow (Medium vibe)
+      // 3. sticky top-0: Luôn dính ở trên cùng
+      className="!bg-white border-b border-gray-100 flex items-center justify-between sticky top-0 z-40 px-4 h-16"
       style={{
         padding: '0 16px',
         background: colorBgContainer,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'sticky',
-        top: 0,
-        zIndex: 10, // Tăng z-index để không bị nội dung đè lên
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
       }}
     >
       <Button
@@ -106,18 +104,20 @@ const AppHeader = ({ collapsed, setCollapsed }) => {
         >
           <Space className="cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors select-none">
             {/* Logic hiển thị Avatar: Có ảnh thì hiện ảnh, không thì hiện chữ cái đầu */}
+            {/* Avatar */}
             {user?.avatar ? (
-              <Avatar src={user.avatar} />
+              <Avatar src={user.avatar} size="default" />
             ) : (
               <Avatar
-                style={{ backgroundColor: '#1677ff' }}
+                style={{ backgroundColor: '#111827' }} // Black bg
                 icon={<UserOutlined />}
+                size="default"
               >
                 {user?.name?.charAt(0)?.toUpperCase()}
               </Avatar>
             )}
 
-            <div className="flex flex-col items-start leading-tight hidden sm:flex">
+            <div className="flex flex-col items-start leading-tight sm:flex">
               <span className="font-semibold text-gray-800 text-sm">
                 {user?.name || 'User'}
               </span>

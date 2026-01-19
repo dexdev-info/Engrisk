@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { vocabularyService } from '../services/vocabularyService'
 
-export const useVocabulary = ({ id, slug }) => {
+export const useVocabulary = ({ id, slug, enabled = true }) => {
   const [vocab, setVocab] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -9,7 +9,7 @@ export const useVocabulary = ({ id, slug }) => {
   const abortRef = useRef(null)
 
   const fetchVocab = useCallback(async () => {
-    if (!id && !slug) return
+    if (!enabled || (!id && !slug)) return
 
     abortRef.current?.abort()
     const controller = new AbortController()
@@ -39,7 +39,7 @@ export const useVocabulary = ({ id, slug }) => {
         setLoading(false)
       }
     }
-  }, [id, slug])
+  }, [id, slug, enabled])
 
   useEffect(() => {
     fetchVocab()

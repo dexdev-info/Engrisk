@@ -27,7 +27,7 @@ router.post('/:id/notes', protect, updateVocabNotes)
 router.post('/review/:id', protect, reviewVocab)
 
 // ===== DETAIL =====
-router.get('/:id', optionalAuth, getVocabularyById)
-router.get('/:slug', optionalAuth, getVocabularyBySlug)
+router.get('/id/:id', optionalAuth, getVocabularyById)
+router.get('/slug/:slug', optionalAuth, getVocabularyBySlug)
 
 export default router

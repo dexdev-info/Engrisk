@@ -1,8 +1,11 @@
 import { Progress, Breadcrumb, Tag } from 'antd'
 import { ClockCircleOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const LessonHeader = ({ lesson, progress, navigation }) => {
+  const navigate = useNavigate()
+
   if (!lesson) return null
 
   const coursePercent =
@@ -19,7 +22,11 @@ const LessonHeader = ({ lesson, progress, navigation }) => {
             title: <Link to="/courses">Khóa học</Link>
           },
           {
-            title: lesson.course.title
+            title: (
+              <Link to={`/courses/${lesson.course.slug}`}>
+                {lesson.course.title}
+              </Link>
+            )
           },
           {
             title: lesson.title
@@ -28,7 +35,7 @@ const LessonHeader = ({ lesson, progress, navigation }) => {
       />
 
       {/* Title */}
-      <h1 className="text-2xl font-bold">{lesson.title}</h1>
+      <h1 className="text-2xl font-bold mt-3!">{lesson.title}</h1>
 
       {/* Meta */}
       <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -37,7 +44,7 @@ const LessonHeader = ({ lesson, progress, navigation }) => {
         </span>
         <Tag>{lesson.type.toUpperCase()}</Tag>
         {progress?.accessCount && (
-          <Tag color="blue">{progress.accessCount} lượt học</Tag>
+          <Tag color="green">{progress.accessCount} lượt học</Tag>
         )}
       </div>
 

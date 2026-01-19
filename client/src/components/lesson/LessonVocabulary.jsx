@@ -23,7 +23,7 @@ const LessonVocabulary = ({ vocabularies }) => {
             className={`px-3 py-1 rounded ${
               v.isSaved
                 ? 'bg-yellow-100 text-yellow-700'
-                : 'bg-blue-50 text-blue-700'
+                : 'bg-green-50 text-green-700'
             }`}
           >
             {v.word}
@@ -33,7 +33,11 @@ const LessonVocabulary = ({ vocabularies }) => {
 
       {active && (
         <VocabularyModal
-          vocab={active}
+          // key={active._id}
+          open={true}
+          vocabId={active._id}
+          vocabSlug={active.slug}
+          initialVocab={active}
           onClose={() => setActive(null)}
           onSavedChange={(saved) => handleToggleSaved(active._id, saved)}
         />

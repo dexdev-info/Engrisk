@@ -211,7 +211,8 @@ export const toggleSaveVocab = async (req, res, next) => {
       userVocab = await UserVocabulary.create({
         user: userId,
         vocabulary: vocabId,
-        status: 'learning'
+        status: 'learning',
+        nextReviewAt: new Date() // Set ngay thời điểm hiện tại
       })
 
       // Increase usageCount
@@ -408,10 +409,16 @@ export const updateVocabNotes = async (req, res, next) => {
 // @access  Private
 export const getReviewQueue = async (req, res, next) => {
   try {
+    const now = new Date()
     const reviewQueue = await UserVocabulary.find({
       user: req.user._id,
-      nextReviewAt: { $lte: new Date() },
-      status: { $in: ['learning', 'reviewing'] } // Exclude mastered from daily reviews
+      $or: [
+        { nextReviewAt: { $lte: now } }, // Đã đến hạn
+        { reviewCount: 0 }, // First review
+        { nextReviewAt: null }, // Hoặc chưa có lịch (data lỗi/mới tinh)
+        { nextReviewAt: { $exists: false } }
+      ],
+      status: { $in: ['learning', 'reviewing'] } // Không lấy mastered
     })
       .populate('vocabulary')
       .sort({ nextReviewAt: 1 })

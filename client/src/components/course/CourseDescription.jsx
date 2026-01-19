@@ -1,16 +1,17 @@
-import { Card, Typography } from 'antd'
-
-const { Paragraph } = Typography
-
 const CourseDescription = ({ description }) => {
   if (!description) return null
 
   return (
-    <Card className="mb-8 shadow-sm border-gray-100 bg-blue-50/30">
-      <Paragraph className="text-lg text-gray-700 leading-relaxed mb-0">
+    <div className="mb-10 animate-fade-in">
+      <p
+        className="
+        text-lg md:text-xl text-gray-800 leading-relaxed font-inter
+        first-letter:text-5xl first-letter:font-bold first-letter:float-left first-letter:mr-3 first-letter:mt-[-4px]
+      "
+      >
         {description}
-      </Paragraph>
-    </Card>
+      </p>
+    </div>
   )
 }
 

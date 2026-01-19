@@ -1,7 +1,10 @@
-import { Card, Button, Tag, Divider, Progress, Typography } from 'antd'
-import { CheckCircleOutlined } from '@ant-design/icons'
-
-const { Title, Text } = Typography
+import { Button, Progress, Tag } from 'antd'
+import {
+  CheckOutlined,
+  SafetyCertificateOutlined,
+  MobileOutlined,
+  HistoryOutlined
+} from '@ant-design/icons'
 
 const CourseActionCard = ({
   course,
@@ -13,90 +16,90 @@ const CourseActionCard = ({
   if (!course) return null
 
   return (
-    <Card
-      cover={
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden sticky top-24">
+      {/* Image Cover */}
+      <div className="relative h-48 bg-gray-100">
         <img
           alt={course.title}
           src={course.thumbnail || 'https://via.placeholder.com/400x250'}
-          className="h-48 object-cover"
+          className="w-full h-full object-cover"
         />
-      }
-      className="shadow-lg border-0 overflow-hidden rounded-xl"
-    >
-      <div className="text-center">
-        <Title level={2} className="!text-blue-600 !mb-1">
-          Miễn phí
-        </Title>
+        {/* Price Tag Overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold">Miễn phí</span>
+            <span className="text-sm text-gray-300 line-through decoration-gray-400">
+              1.200.000đ
+            </span>
+          </div>
+        </div>
+      </div>
 
-        <Text type="secondary" className="line-through">
-          1.200.000đ
-        </Text>
-        <Tag color="red" className="ml-2">
-          FREE
-        </Tag>
-
-        <Divider className="my-4" />
-
+      <div className="p-6">
+        {/* CTA Button Area */}
         {isEnrolled ? (
-          <>
-            <Tag color="success" className="mb-3">
-              ✓ Đã đăng ký
-            </Tag>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-semibold text-emerald-600 flex items-center gap-1">
+                <CheckOutlined /> Đã đăng ký
+              </span>
+              <span className="text-xs text-gray-500">
+                {Math.round(course.enrollmentData?.progressPercentage || 0)}%
+                hoàn thành
+              </span>
+            </div>
 
-            {course.enrollmentData && (
-              <div className="mb-4 text-left">
-                <div className="text-sm text-gray-600 mb-1">
-                  Tiến độ khóa học
-                </div>
-                <Progress
-                  percent={course.enrollmentData.progressPercentage}
-                  strokeColor={{
-                    from: '#108ee9',
-                    to: '#87d068'
-                  }}
-                  size="small"
-                />
-              </div>
-            )}
+            <Progress
+              percent={course.enrollmentData?.progressPercentage}
+              showInfo={false}
+              strokeColor="#000000" // Thanh tiến độ màu đen
+              size="small"
+              className="mt-5!"
+            />
 
             <Button
               type="primary"
               size="large"
               block
-              className="h-12 text-lg font-bold bg-green-600 hover:bg-green-500 border-none"
               onClick={onResume}
+              className="bg-black! text-white! hover:bg-gray-800! border-none font-bold h-12 rounded-lg mt-5!"
             >
               TIẾP TỤC HỌC
             </Button>
-          </>
+          </div>
         ) : (
           <Button
             type="primary"
             size="large"
             block
-            className="h-12 text-lg font-bold shadow-blue-300 shadow-lg"
             loading={enrolling}
             onClick={onEnroll}
+            className="bg-black! text-white! hover:bg-gray-800! border-none font-bold h-12 rounded-lg shadow-xl shadow-gray-200 mt-5!"
           >
             ĐĂNG KÝ NGAY
           </Button>
         )}
 
-        <div className="mt-4 space-y-2 text-left text-gray-600 text-sm">
-          <p className="flex items-center gap-2">
-            <CheckCircleOutlined className="text-green-500" /> Truy cập trọn đời
-          </p>
-          <p className="flex items-center gap-2">
-            <CheckCircleOutlined className="text-green-500" /> Học trên mọi
-            thiết bị
-          </p>
-          <p className="flex items-center gap-2">
-            <CheckCircleOutlined className="text-green-500" /> Cấp chứng chỉ khi
-            hoàn thành
-          </p>
+        {/* Benefits List */}
+        <div className="mt-8 space-y-4 pt-6 border-t border-gray-100">
+          <h4 className="font-bold text-sm text-gray-900 mb-5!">Khóa học bao gồm:</h4>
+          <ul className="space-y-3 text-sm text-gray-600">
+            <li className="flex items-start gap-3">
+              <HistoryOutlined className="mt-0.5 text-gray-400" />
+              <span>Truy cập trọn đời không giới hạn</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <MobileOutlined className="mt-0.5 text-gray-400" />
+              <span>Học trên mọi thiết bị (Mobile, Web)</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <SafetyCertificateOutlined className="mt-0.5 text-gray-400" />
+              <span>Cấp chứng chỉ khi hoàn thành</span>
+            </li>
+          </ul>
         </div>
       </div>
-    </Card>
+    </div>
   )
 }
 

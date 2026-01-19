@@ -3,7 +3,6 @@ import {
   StarOutlined,
   SoundOutlined,
   BookOutlined,
-  TrophyOutlined
 } from '@ant-design/icons'
 
 import { useVocabulary } from '../../hooks/useVocabulary.js'
@@ -18,9 +17,11 @@ const VocabularyModal = ({
   onClose,
   onSavedChange
 }) => {
+  const hasInitial = Boolean(initialVocab)
   const { vocab, loading, error } = useVocabulary({
     id: vocabId,
-    slug: vocabSlug
+    slug: vocabSlug,
+    enabled: !hasInitial
   })
 
   const data = vocab || initialVocab
@@ -50,7 +51,7 @@ const VocabularyModal = ({
         </div>
       )}
 
-      {error && (
+      {error && !initialVocab && (
         <div className="text-center text-red-500 py-8">
           Không thể tải từ vựng
         </div>
@@ -78,6 +79,16 @@ const VocabularyModal = ({
                   /{data.pronunciation}/
                 </div>
               )}
+
+              {data.imageUrl && (
+                <div className="flex justify-center">
+                  <img
+                    src={data.imageUrl}
+                    alt={data.word}
+                    className="max-h-48 rounded-lg object-contain"
+                  />
+                </div>
+              )}
             </div>
 
             <Button
@@ -92,7 +103,7 @@ const VocabularyModal = ({
 
           {/* ===== META ===== */}
           <div className="flex flex-wrap gap-2">
-            <Tag color="blue">{data.level}</Tag>
+            <Tag color="green">{data.level}</Tag>
             <Tag>{data.partOfSpeech}</Tag>
 
             {data.userVocabulary?.status && (
@@ -155,8 +166,22 @@ const VocabularyModal = ({
             </div>
           )}
 
+          {/* {data.relatedWords?.length > 0 && (
+            <>
+              <Divider />
+              <div>
+                <h4 className="font-semibold mb-2">Từ liên quan</h4>
+                <div className="flex flex-wrap gap-2">
+                  {data.relatedWords.map((w) => (
+                    <Tag key={w._id}>{w.word}</Tag>
+                  ))}
+                </div>
+              </div>
+            </>
+          )} */}
+
           {/* ===== REVIEW INFO ===== */}
-          {data.userVocabulary && (
+          {/* {data.userVocabulary && (
             <>
               <Divider />
               <div className="space-y-2 text-sm text-gray-600">
@@ -174,7 +199,7 @@ const VocabularyModal = ({
                 )}
               </div>
             </>
-          )}
+          )} */}
         </div>
       )}
     </Modal>

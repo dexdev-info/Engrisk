@@ -23,7 +23,7 @@ const Register = () => {
         email: values.email,
         password: values.password
       })
-      toast.success('Đăng ký thành công! Hãy bắt đầu học ngay. 🚀')
+      toast.success('Đăng ký thành công! Đăng nhập ngay nào. 🚀')
       navigate('/login')
     } catch (error) {
       toast.error(error.response?.data?.error || 'Đăng ký thất bại')
@@ -33,13 +33,14 @@ const Register = () => {
   }
 
   return (
-    <div className="w-full">
-      <div className="mb-6 text-center">
-        <h2 className="text-3xl font-bold text-gray-900">
-          Tạo tài khoản mới 🚀
+    <div className="w-full max-w-md mx-auto animate-fade-in">
+      {/* HEADER */}
+      <div className="mb-10 text-center">
+        <h2 className="text-4xl font-serif font-bold text-gray-900 mb-3 tracking-tight">
+          Join Engrisk
         </h2>
-        <p className="mt-2 text-gray-600">
-          Tham gia cộng đồng học tiếng Anh Engrisk.
+        <p className="text-gray-500 font-sans">
+          Tạo tài khoản để bắt đầu hành trình chinh phục tiếng Anh.
         </p>
       </div>
 
@@ -49,6 +50,7 @@ const Register = () => {
         onFinish={onFinish}
         size="large"
         scrollToFirstError
+        requiredMark={false}
       >
         <Form.Item
           name="name"
@@ -61,9 +63,9 @@ const Register = () => {
           ]}
         >
           <Input
-            prefix={<UserOutlined className="text-gray-400" />}
-            placeholder="Họ và tên"
-            className="rounded-lg"
+            prefix={<UserOutlined className="text-gray-400 mr-2" />}
+            placeholder="Họ và tên của bạn"
+            className="h-12 rounded-xl bg-gray-50 border-gray-200 hover:bg-white focus:bg-white hover:border-gray-400 focus:border-black transition-all"
           />
         </Form.Item>
 
@@ -75,9 +77,9 @@ const Register = () => {
           ]}
         >
           <Input
-            prefix={<MailOutlined className="text-gray-400" />}
-            placeholder="Email"
-            className="rounded-lg"
+            prefix={<MailOutlined className="text-gray-400 mr-2" />}
+            placeholder="Địa chỉ Email"
+            className="h-12 rounded-xl bg-gray-50 border-gray-200 hover:bg-white focus:bg-white hover:border-gray-400 focus:border-black transition-all"
           />
         </Form.Item>
 
@@ -85,21 +87,19 @@ const Register = () => {
           name="password"
           rules={[
             { required: true, message: 'Vui lòng nhập mật khẩu!' },
-            { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
+            { min: 6, message: 'Mật khẩu tối thiểu 6 ký tự!' }
           ]}
-          hasFeedback
         >
           <Input.Password
-            prefix={<LockOutlined className="text-gray-400" />}
+            prefix={<LockOutlined className="text-gray-400 mr-2" />}
             placeholder="Mật khẩu"
-            className="rounded-lg"
+            className="h-12 rounded-xl bg-gray-50 border-gray-200 hover:bg-white focus:bg-white hover:border-gray-400 focus:border-black transition-all"
           />
         </Form.Item>
 
         <Form.Item
           name="confirm"
           dependencies={['password']}
-          hasFeedback
           rules={[
             { required: true, message: 'Vui lòng xác nhận mật khẩu!' },
             ({ getFieldValue }) => ({
@@ -107,23 +107,23 @@ const Register = () => {
                 if (!value || getFieldValue('password') === value) {
                   return Promise.resolve()
                 }
-                return Promise.reject(new Error('Hai mật khẩu không khớp!'))
+                return Promise.reject(new Error('Mật khẩu không khớp!'))
               }
             })
           ]}
         >
           <Input.Password
-            prefix={<LockOutlined className="text-gray-400" />}
-            placeholder="Xác nhận mật khẩu"
-            className="rounded-lg"
+            prefix={<LockOutlined className="text-gray-400 mr-2" />}
+            placeholder="Nhập lại mật khẩu"
+            className="h-12 rounded-xl bg-gray-50 border-gray-200 hover:bg-white focus:bg-white hover:border-gray-400 focus:border-black transition-all"
           />
         </Form.Item>
 
-        <Form.Item>
+        <Form.Item className="mt-8">
           <Button
             type="primary"
             htmlType="submit"
-            className="w-full h-10 rounded-lg bg-blue-600 hover:bg-blue-700 font-semibold"
+            className="w-full h-12 rounded-xl bg-black hover:!bg-gray-800 border-none font-bold text-base shadow-lg shadow-gray-200"
             loading={loading}
           >
             Đăng Ký Tài Khoản
@@ -131,10 +131,13 @@ const Register = () => {
         </Form.Item>
       </Form>
 
-      <p className="mt-4 text-center text-gray-600">
-        Đã có tài khoản?{' '}
-        <Link to="/login" className="text-blue-600 font-medium hover:underline">
-          Đăng nhập ngay
+      <p className="mt-6 text-center text-gray-500 text-sm">
+        Đã là thành viên?{' '}
+        <Link
+          to="/login"
+          className="text-black font-bold hover:underline underline-offset-4"
+        >
+          Đăng nhập
         </Link>
       </p>
     </div>

@@ -11,12 +11,12 @@ export const vocabularyService = {
   },
 
   async getById({ vocabId, signal }) {
-    const { data } = await api.get(`/vocabulary/${vocabId}`, { signal })
+    const { data } = await api.get(`/vocabulary/id/${vocabId}`, { signal })
     return data
   },
 
   async getBySlug({ slug, signal }) {
-    const { data } = await api.get(`/vocabulary/${slug}`, { signal })
+    const { data } = await api.get(`/vocabulary/slug/${slug}`, { signal })
     return data
   },
 

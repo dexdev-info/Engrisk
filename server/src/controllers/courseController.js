@@ -6,7 +6,6 @@ export const getCourses = async (req, res, next) => {
   try {
     const courses = await Course.find({
       isPublished: true,
-      isDeleted: false
     })
       .select(
         'title slug thumbnail level description lessonsCount enrolledCount estimatedDuration'
@@ -28,7 +27,6 @@ export const getCourseBySlug = async (req, res, next) => {
     const course = await Course.findOne({
       slug: req.params.slug,
       isPublished: true,
-      isDeleted: false
     }).populate({
       path: 'lessons',
       select: 'title slug type duration isPublished orderIndex',

@@ -1,4 +1,3 @@
-// models/UserVocabulary.js
 import { Schema, model } from 'mongoose'
 
 const userVocabularySchema = new Schema(
@@ -13,7 +12,6 @@ const userVocabularySchema = new Schema(
       ref: 'Vocabulary',
       required: true
     },
-    // Learning status
     status: {
       type: String,
       enum: ['learning', 'reviewing', 'mastered'],
@@ -23,29 +21,23 @@ const userVocabularySchema = new Schema(
       type: Boolean,
       default: false
     },
-    // Review count
     reviewCount: {
       type: Number,
       default: 0
     },
-    // Correct review count
     correctReviewCount: {
       type: Number,
       default: 0
     },
-    // Last reviewed date
     lastReviewedAt: {
       type: Date,
       default: null
     },
-    // Next review date (spaced repetition)
     nextReviewAt: {
       type: Date,
       default: function () {
         // Default: review tomorrow
-        const tomorrow = new Date()
-        tomorrow.setDate(tomorrow.getDate() + 1)
-        return tomorrow
+        return new Date(Date.now() + 24 * 60 * 60 * 1000)
       }
     },
     // Difficulty multiplier (affects review intervals)
@@ -55,7 +47,6 @@ const userVocabularySchema = new Schema(
       min: 0.5,
       max: 3
     },
-    // User's personal notes for this vocabulary
     notes: {
       type: String,
       default: '',
@@ -67,47 +58,74 @@ const userVocabularySchema = new Schema(
   }
 )
 
+// Review intervals (spaced repetition) - days
+const INTERVALS = {
+  learning: [1, 3, 7],
+  reviewing: [14, 30, 60],
+  mastered: [90, 180, 365]
+}
+
 // Calculate next review date based on spaced repetition
 userVocabularySchema.methods.calculateNextReview = function (isCorrect) {
-  const intervals = {
-    learning: [1, 3, 7], // days
-    reviewing: [14, 30, 60],
-    mastered: [90, 180, 365]
-  }
+  // Tổng số lần review
+  this.reviewCount += 1
+  this.lastReviewedAt = new Date()
+
+  const now = Date.now()
 
   if (isCorrect) {
+    // Tăng chuỗi trả lời đúng
     this.correctReviewCount += 1
 
-    // Increase interval
-    const currentIntervals = intervals[this.status]
+    // Giảm độ khó khi trả lời đúng (adaptive difficulty)
+    this.difficultyLevel = Math.max(this.difficultyLevel * 0.8, 0.5)
+
+    // Trả lời đúng càng nhiều → interval gốc càng lớn
+    const currentIntervals = INTERVALS[this.status]
+
     const reviewIndex = Math.min(
       this.correctReviewCount - 1,
       currentIntervals.length - 1
     )
-    const daysToAdd = currentIntervals[reviewIndex] * this.difficultyLevel
 
-    const nextDate = new Date()
-    nextDate.setDate(nextDate.getDate() + daysToAdd)
-    this.nextReviewAt = nextDate
+    // Difficulty càng cao (càng khó) → số ngày càng nhỏ → gặp lại sớm
+    const daysToAdd = currentIntervals[reviewIndex] / this.difficultyLevel
+    this.nextReviewAt = new Date(now + daysToAdd * 24 * 60 * 60 * 1000)
 
     // Update status
-    if (this.correctReviewCount >= 3 && this.status === 'learning') {
+    if (this.status === 'learning' && this.correctReviewCount >= 3) {
       this.status = 'reviewing'
-    } else if (this.correctReviewCount >= 7 && this.status === 'reviewing') {
+    } else if (this.status === 'reviewing' && this.correctReviewCount >= 7) {
       this.status = 'mastered'
-      this.isMastered = true
     }
   } else {
+    // mất 1 chuỗi đúng
+    this.correctReviewCount = Math.max(this.correctReviewCount - 1, 0)
+
     // Reset to shorter interval on incorrect answer
     this.difficultyLevel = Math.min(this.difficultyLevel * 1.2, 3)
 
-    const nextDate = new Date()
-    nextDate.setDate(nextDate.getDate() + 1)
-    this.nextReviewAt = nextDate
+    // Downgrade status
+    if (this.status === 'mastered') {
+      this.status = 'reviewing'
+      this.isMastered = false
+    } else if (this.status === 'reviewing') {
+      this.status = 'learning'
+    }
+
+    // ôn lại sớm (1 ngày)
+    this.nextReviewAt = new Date(now + 1 * 24 * 60 * 60 * 1000)
   }
 
-  this.reviewCount += 1
-  this.lastReviewedAt = new Date()
+  // Đồng bộ isMastered theo status
+  if (this.status === 'mastered') {
+    this.isMastered = true
+  }
+
+  // Nếu đã mastered, giới hạn correctReviewCount
+  if (this.status === 'mastered') {
+    this.correctReviewCount = Math.min(this.correctReviewCount, 5)
+  }
 }
 
 // Compound unique index

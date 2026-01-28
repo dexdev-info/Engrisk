@@ -137,9 +137,10 @@ courseSchema.methods.softDelete = async function () {
 }
 
 // Indexes
-courseSchema.index({ slug: 1 })
+//* filter
 courseSchema.index({ level: 1, isPublished: 1 })
 courseSchema.index({ createdBy: 1 })
+courseSchema.index({ isDeleted: 1 })
 
 const Course = model('Course', courseSchema)
 export default Course

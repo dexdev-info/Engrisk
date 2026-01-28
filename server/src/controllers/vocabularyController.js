@@ -37,7 +37,7 @@ export const getVocabularies = async (req, res, next) => {
 
     const total = await Vocabulary.countDocuments(query)
 
-    // 🔥 NEW: Check which vocabs user has saved (if logged in)
+    // Check which vocabs user has saved (if logged in)
     let savedVocabIds = []
     if (req.user) {
       const userVocabs = await UserVocabulary.find({
@@ -331,21 +331,22 @@ export const reviewVocab = async (req, res, next) => {
       return next(new ErrorResponse('Unauthorized access', 403))
     }
 
-    // 🔥 Calculate next review using SRS algorithm
+    const wasMastered = userVocab.isMastered
+
+    // Calculate next review using SRS algorithm
     userVocab.calculateNextReview(isCorrect)
     await userVocab.save()
 
     // Check if just mastered
-    const justMastered =
-      userVocab.isMastered && userVocab.correctReviewCount === 7
+    const justMastered = !wasMastered && userVocab.isMastered
 
     res.status(200).json({
       success: true,
       message: isCorrect
         ? justMastered
-          ? '🎉 Chúc mừng! Bạn đã thành thạo từ này!'
-          : '✅ Chính xác! Tiếp tục phát huy nhé.'
-        : '❌ Chưa đúng! Đừng bỏ cuộc, cố gắng thêm nha.',
+          ? 'Chúc mừng! Bạn đã thành thạo từ này!'
+          : 'Chính xác! Tiếp tục phát huy nhé.'
+        : 'Chưa đúng! Đừng bỏ cuộc, cố gắng thêm nha.',
       data: {
         vocabulary: {
           _id: userVocab.vocabulary._id,
@@ -410,22 +411,39 @@ export const updateVocabNotes = async (req, res, next) => {
 export const getReviewQueue = async (req, res, next) => {
   try {
     const now = new Date()
-    const reviewQueue = await UserVocabulary.find({
+    let reviewQueue = await UserVocabulary.find({
       user: req.user._id,
-      $or: [
-        { nextReviewAt: { $lte: now } }, // Đã đến hạn
-        { reviewCount: 0 }, // First review
-        { nextReviewAt: null }, // Hoặc chưa có lịch (data lỗi/mới tinh)
-        { nextReviewAt: { $exists: false } }
-      ],
-      status: { $in: ['learning', 'reviewing'] } // Không lấy mastered
+      // $or: [
+      //   { nextReviewAt: { $lte: now } }, // Đã đến hạn
+      //   { reviewCount: 0 }, // First review
+      //   { nextReviewAt: null }, // Hoặc chưa có lịch (data lỗi/mới tinh)
+      //   { nextReviewAt: { $exists: false } }
+      // ],
+      status: { $in: ['learning', 'reviewing'] }, // Không lấy mastered
+      nextReviewAt: { $lte: now }
     })
       .populate('vocabulary')
       .sort({ nextReviewAt: 1 })
       .limit(50) // Max 50 reviews per session
 
+    // FALLBACK: nếu chưa tới ngày ôn nhưng user vẫn muốn học
+    if (reviewQueue.length === 0) {
+      reviewQueue = await UserVocabulary.find({
+        user: req.user._id,
+        status: { $in: ['learning', 'reviewing'] }
+      })
+        .populate('vocabulary')
+        .sort({
+          // học từ mới trước
+          reviewCount: 1,
+          updatedAt: -1
+        })
+        .limit(20)
+    }
+
     res.status(200).json({
       success: true,
+      mode: reviewQueue.some((v) => v.nextReviewAt <= now) ? 'due' : 'practice',
       count: reviewQueue.length,
       data: reviewQueue
     })

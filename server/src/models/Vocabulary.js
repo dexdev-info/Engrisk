@@ -123,12 +123,12 @@ const vocabularySchema = new Schema(
 /* =======================
     QUERY FILTER
 ======================= */
-// const autoExcludeDeleted = function () {
-//   this.where({ isDeleted: false })
-// }
+const autoExcludeDeleted = function () {
+  this.where({ isDeleted: false })
+}
 
-// vocabularySchema.pre(/^find/, autoExcludeDeleted)
-// vocabularySchema.pre('countDocuments', autoExcludeDeleted)
+vocabularySchema.pre(/^find/, autoExcludeDeleted)
+vocabularySchema.pre('countDocuments', autoExcludeDeleted)
 
 /* =======================
     SLUG UNIQUE
@@ -173,16 +173,17 @@ vocabularySchema.statics.incrementUsage = function (id) {
 // * use: await Vocabulary.incrementUsage(vocabId)
 
 // Indexes
-vocabularySchema.index({ word: 1 })
-// *
+// *  search
 vocabularySchema.index({
   word: 'text',
   meaning: 'text',
   example: 'text'
 })
+// * filter / sort
 vocabularySchema.index({ level: 1 })
 vocabularySchema.index({ partOfSpeech: 1 })
 vocabularySchema.index({ usageCount: -1 })
+vocabularySchema.index({ isDeleted: 1 })
 
 const Vocabulary = model('Vocabulary', vocabularySchema)
 export default Vocabulary
